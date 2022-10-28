@@ -1,9 +1,19 @@
 <template>
     <v-container>
-        <v-snackbar v-model="users.snackBar" timeout="2000" color="success" top>{{users.message}}</v-snackbar>
+        <v-main>
+            <NavBar>
+                <template v-slot:Login>
+                    <v-btn left text>Login</v-btn>
+                </template>
+                <template v-slot:SignUp>
+                    <v-btn right text>SignUp</v-btn>
+                </template>
+            </NavBar>
+        </v-main>
+        <v-snackbar v-model="users.snackBar" timeout="2000" color="success" top>{{    users.message    }}</v-snackbar>
         <v-layout>
             <v-flex>
-                <v-card elevation="1" width="60%" class="mx-auto">
+                <v-card elevation="0" width="60%" class="mx-auto">
                     <v-card-title>Signup</v-card-title>
                     <v-card-text>
                         <v-form>
@@ -19,29 +29,31 @@
     </v-container>
 </template>
 <script>
-
+import NavBar from './navBar.vue';
 export default {
     name: "SignUp",
     data() {
         return {
             items: ['Admin', 'guest'],
-            signUpDetails: {userName: '', role: '', password: null}
+            signUpDetails: { userName: '', role: '', password: null }
         }
     },
     computed: {
-        users(){
+        users() {
             return this.$store.getters.users;
         }
     },
-    methods:{
-        addUser(){
+    methods: {
+        addUser() {
             this.$store.dispatch('addUser', this.signUpDetails);
         }
-    }
+    },
+    components: { NavBar }
 }
 </script>
 <style scoped>
 .mx-auto {
     padding: 50px 10px;
+    border: 1px solid lightgray;
 }
 </style>

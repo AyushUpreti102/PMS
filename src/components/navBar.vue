@@ -1,20 +1,26 @@
 <template>
-    <v-app-bar elevation="0">
+    <v-app-bar elevation="0" app>
         <v-app-bar-title>
             <h2>Poll Management System</h2>
         </v-app-bar-title>
         <v-spacer></v-spacer>
         <router-link to="/LoginPage" class="btn btn1">
-            <v-btn left text>Login</v-btn>
-        </router-link>
-        <router-link to="/Signup" class="btn btn2">
-            <v-btn right text>SignUp</v-btn>
-        </router-link>
+            <slot name="Login"></slot>
+            </router-link>
+            <router-link to="/Signup" class="btn btn2">
+                <slot name="SignUp"></slot>
+            </router-link>
+            <slot name="Logout"></slot>
     </v-app-bar>
 </template>
 <script>
 export default {
-    name: 'navBar'
+    name: 'navBar',
+    computed: {
+        users() {
+            return this.$store.getters.users;
+        }
+    },
 }
 </script>
 
