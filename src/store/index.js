@@ -20,23 +20,6 @@ export default new Vuex.Store({
     }
   },
   mutations: {
-    ADD_USER: (state, payload)=>{
-      console.log('error '+payload.data.error ,payload.data.message);
-      state.newUser= payload
-      if(payload.data.error===0){
-        state.message='Signup completed'
-        state.snackBar=true;
-      }
-      else{
-        state.message=payload.data.message;
-        state.snackBar=true;
-      }
-    },
-    ADD_POLL: (state, payload)=>{
-      let data = JSON.parse(payload)
-      state.poll.push(data.data);
-      console.log(data.data);
-    },
     LOGIN: (state, payload)=>{
       console.log(payload.resp);
       state.existedUser=payload.resp;
@@ -54,6 +37,23 @@ export default new Vuex.Store({
         state.show=true;
       }
     },
+    ADD_USER: (state, payload)=>{
+      console.log('error '+payload.data.error ,payload.data.message);
+      state.newUser= payload
+      if(payload.data.error===0){
+        state.message='Signup completed'
+        state.snackBar=true;
+      }
+      else{
+        state.message=payload.data.message;
+        state.snackBar=true;
+      }
+    },
+    ADD_POLL: (state, payload)=>{
+      let data = JSON.parse(payload)
+      state.poll.push({id: data.data.id, title: data.data.title, options: data.data.options, radioGroup: null});
+      console.log(data.data);
+    },
     LOGOUT: (state, payload)=>{
       state;
       payload.router.push({path: '/', component: payload.component});
@@ -65,25 +65,36 @@ export default new Vuex.Store({
       console.log(payload.data.data[0]);
     },
     VOTE:(state, payload)=>{
-      state;
-      console.log(JSON.parse(payload));
+      let resp =JSON.parse(payload);
+      state.poll;
+      console.log(resp);
+    },
+    VALIDATE(state, payload){
+      state.message=payload
+      state.snackBar=true;
     }
   },
   actions: {
+    login: (context, payload)=>{
+      axios.get(`https://secure-refuge-14993.herokuapp.com/login?username=${payload.loginDetails.userName}&password=${payload.loginDetails.password}`).then((resp)=>{
+        context.commit('LOGIN', {resp: resp.data, router: payload.router});
+      })
+    },
     addUser: (context, payload)=>{
       console.log(payload.loginDetails.userName, payload.loginDetails.role, payload.loginDetails.password);
       axios.get(`https://secure-refuge-14993.herokuapp.com/add_user?username=${payload.loginDetails.userName}&password=${payload.loginDetails.password}&role=${payload.loginDetails.role}`).then((resp)=>{
         context.commit('ADD_USER', resp);
       })
     },
-    addPoll: (context)=>{
-      axios.get(`https://secure-refuge-14993.herokuapp.com/add_poll?title=first%20polll&options=opt1____opt2____opt3`).then((resp)=>{
+    addPoll: (context, payload)=>{
+      let poll = JSON.parse(payload)
+      let option = "";
+      for(let i = 0; i < poll.options.length-1; i++) {
+        option = option.concat(poll.options[i].option, "____")
+      }
+      option = option.concat(poll.options[poll.options.length -1].option);
+      axios.get(`https://secure-refuge-14993.herokuapp.com/add_poll?title=${poll.title}&options=${option}`).then((resp)=>{
         context.commit('ADD_POLL', JSON.stringify(resp.data));
-      })
-    },
-    login: (context, payload)=>{
-      axios.get(`https://secure-refuge-14993.herokuapp.com/login?username=${payload.loginDetails.userName}&password=${payload.loginDetails.password}`).then((resp)=>{
-        context.commit('LOGIN', {resp: resp.data, router: payload.router});
       })
     },
     logout: (context, payload)=>{
@@ -95,9 +106,14 @@ export default new Vuex.Store({
       })
     },
     vote: (context, payload)=>{
-      axios.get(`https://secure-refuge-14993.herokuapp.com/do_vote?id=577212fdd1bba33c17b5b64e&option_text=${payload}`).then((resp)=>{
+      axios.get(`https://secure-refuge-14993.herokuapp.com/do_vote?id=${payload.id}&option_text=${payload.radioGroup}`).then((resp)=>{
         context.commit('VOTE', JSON.stringify(resp));
+      }).catch((err)=>{
+        console.log(err);
       })
+    },
+    validate: (context, payload)=>{
+      context.commit('VALIDATE', payload);
     }
   },
   modules: {

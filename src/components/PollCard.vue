@@ -1,14 +1,13 @@
 <template>
     <v-container>
         <v-layout row wrap>
-            <v-flex v-for="(value) in users.poll" :key="value.id" xs12 sm6 md4 lg3 style="padding: 10px;">
+            <v-flex v-for="(value, i) in users.poll" :key="i" xs12 sm6 md4 lg3 style="padding: 10px; min-width: 200px;">
                 <v-card elevation="0" class="mx-auto">
-                    {{ value.id }}
                     <v-card-title>{{ value.title }}</v-card-title>
                     <v-card-text>
-                        <v-radio-group v-model="radioGroup">
+                        <v-radio-group v-model="value.radioGroup">
                             <v-radio v-for="n in value.options" :key="n.option" :label="`${n.option}`" :value="n.option"
-                                @click="vote">
+                                @click="vote(value.id, value.radioGroup)">
                             </v-radio>
                         </v-radio-group>
                         <v-card-actions>
@@ -27,7 +26,7 @@ export default {
     name: 'PollCard',
     data() {
         return {
-            radioGroup: null,
+
         }
     },
     computed: {
@@ -36,8 +35,8 @@ export default {
         }
     },
     methods: {
-        vote() {
-            // this.$store.dispatch('vote', this.radioGroup);
+        vote(id, radioGroup) {
+            this.$store.dispatch('vote', {id: id, radioGroup: radioGroup});
         }
     }
 }

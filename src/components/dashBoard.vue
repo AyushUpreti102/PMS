@@ -19,8 +19,14 @@
         <v-card-text>
           <v-form>
             <v-text-field label="Poll Title" v-model="title"></v-text-field>
-            <v-text-field label="Poll Options" v-model="option"></v-text-field>
-            <v-btn depressed color="red lighten-1" @click="addOptions">Add option</v-btn>
+            <div class="d-flex">
+                <v-text-field label="Poll Options" v-model="option"></v-text-field>
+                <v-btn depressed color="white" @click="addOptions" style="margin-top: 10px;"><v-icon>mdi-plus-box</v-icon></v-btn>
+            </div>
+            <ul>
+                <p style="margin: 5px 0;">-- Added Options</p>
+                <li v-for="(val, i) in pollOptions" :key="i" style="margin-top: 5px;">{{val.option}}</li>
+            </ul>
           </v-form>
         </v-card-text>
 
@@ -60,15 +66,28 @@ export default {
             dialog: false,
             title: '',
             option: '',
+            pollOptions: [],
         };
     },
     methods: {
         addPoll(){
-            this.dialog = false
-            this.$store.dispatch('addPoll');  
+            if(this.title!==''){
+                if (this.pollOptions.length !== 0) {
+                    this.dialog = false
+                    this.$store.dispatch('addPoll', JSON.stringify({title: this.title, options: this.pollOptions}));  
+                    this.pollOptions.splice(0, this.pollOptions.length);
+                    this.title=''
+                } else {
+                    this.$store.dispatch('validate', 'add options to the poll');   
+                }
+            }
+            else{
+                this.$store.dispatch('validate', 'Add title for poll');
+            }
         },
         addOptions(){
-            console.log('');
+            this.pollOptions.push({option: JSON.parse(JSON.stringify(this.option)), vote: 0});
+            this.option=''
         },
         logout(){
             this.$store.dispatch('logout', {router: this.$router, component: HomePage})
