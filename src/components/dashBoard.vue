@@ -1,6 +1,6 @@
 <template>
     <v-container>
-        <v-snackbar v-model="users.snackBar" timeout="2000" color="success" top>{{ users.message }}</v-snackbar>
+        <v-snackbar v-model="snackBar" timeout="2000" color="success" top>{{message}}</v-snackbar>
         <!-- <v-btn @click="listPolls">List Polls</v-btn> -->
         <div class="text-center">
     <v-dialog
@@ -23,10 +23,12 @@
                 <v-text-field label="Poll Options" v-model="option"></v-text-field>
                 <v-btn depressed color="white" @click="addOptions" style="margin-top: 10px;"><v-icon>mdi-plus-box</v-icon></v-btn>
             </div>
-            <ul>
-                <p style="margin: 5px 0;">-- Added Options</p>
-                <li v-for="(val, i) in pollOptions" :key="i" style="margin-top: 5px;">{{val.option}}</li>
-            </ul>
+            <v-list-item>
+                <v-list-item-content>
+                    <v-list-item-title>Added options</v-list-item-title>
+                    <v-list-item-subtitle v-for="(val, i) in pollOptions" :key="i">{{'- '+val.option}}</v-list-item-subtitle>
+                </v-list-item-content>
+            </v-list-item>
           </v-form>
         </v-card-text>
 
@@ -57,8 +59,11 @@ import HomePage from './HomePage.vue';
 export default {
     name: "dashBoard",
     computed: {
-        users() {
-            return this.$store.getters.users;
+        snackBar() {
+            return this.$store.getters.snackBar;
+        },
+        message() {
+            return this.$store.getters.message;
         }
     },
     data() {

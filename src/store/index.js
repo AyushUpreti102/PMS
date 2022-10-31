@@ -15,8 +15,14 @@ export default new Vuex.Store({
     poll: [],
   },
   getters: {
-    users: (state)=>{
-      return state;
+    poll: (state)=>{
+      return state.poll;
+    },
+    snackBar: (state)=>{
+      state.snackBar
+    },
+    message: (state)=>{
+      return state.message
     }
   },
   mutations: {
@@ -72,7 +78,33 @@ export default new Vuex.Store({
     VALIDATE(state, payload){
       state.message=payload
       state.snackBar=true;
-    }
+    },
+    DELETE_POLL: (state, payload)=>{
+      const resp = JSON.parse(payload);
+      console.log(resp.error, resp.index);
+      if (resp.error===0) {
+        state.poll.splice(resp.index, 1);
+        state.message='Poll deleted successfully'
+        state.snackBar=true;
+      } else {
+        state.snackBar=true;
+        state.message='! invalid poll'
+      }
+    },  
+    DELETE_OPTION: (state, payload)=>{
+      let resp = JSON.parse(payload.data);
+      if (resp.error===0) {
+        console.log(resp, payload.pollIndex, payload.optionIndex);
+        state.poll[payload.pollIndex].options.splice(payload.optionIndex, 1);
+      }
+    },
+    ADD_NEW_OPTIONS_TO_POLL: (state, payload)=>{
+      let resp = JSON.parse(payload.data);
+      if(resp.error===0){
+        console.log(resp, payload.pollIndex, payload.option);
+        state.poll[payload.pollIndex].options.push({option: payload.option, vote: 0})
+      }
+    } 
   },
   actions: {
     login: (context, payload)=>{
@@ -114,6 +146,21 @@ export default new Vuex.Store({
     },
     validate: (context, payload)=>{
       context.commit('VALIDATE', payload);
+    },
+    deletePoll: (context, payload)=>{
+      axios.get(`https://secure-refuge-14993.herokuapp.com/delete_poll?id=${payload.id}`).then((resp)=>{
+        context.commit('DELETE_POLL', JSON.stringify({error: resp.data.error, index: payload.idx}));
+      })
+    },
+    deleteOption: (context, payload)=>{
+      axios.get(`https://secure-refuge-14993.herokuapp.com/delete_poll_option?id=${payload.id}&option_text=${payload.option}`).then((resp)=>{
+        context.commit('DELETE_OPTION', {data: JSON.stringify(resp.data), pollIndex: payload.pollIndex, optionIndex: payload.optionIndex});
+      })
+    },
+    addNewOptionsToPoll: (context, payload)=>{
+      axios.get(`https://secure-refuge-14993.herokuapp.com/add_new_option?id=${payload.id}&option_text=${payload.option}`).then((resp)=>{
+        context.commit('ADD_NEW_OPTIONS_TO_POLL', {data: JSON.stringify(resp.data), pollIndex: payload.pollIndex, option: payload.option});
+      })
     }
   },
   modules: {
