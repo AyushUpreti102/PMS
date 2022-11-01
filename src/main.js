@@ -10,17 +10,20 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next)=>{
-  if (store.getters.logUser && (to.path==='/Login' || to.path==='/Signup')) {
+  let logUser = localStorage.getItem('logUser')
+  if (logUser && (to.path==='/Login' || to.path==='/Signup')) {
     if(from.path==='/dashBoard'){
       next('/');
     }
     if(from.path==='/'){
       next('/dashBoard');
     }
-    console.log(from);
   }
-  else if (!store.getters.logUser && (to.path==='/dashBoard')) {
+  else if (!logUser && (to.path==='/dashBoard')) {
     next('/Login')
+  }
+  else if (!logUser && (to.path==='/Login')) {
+    next('/');
   }
   else{
     next();

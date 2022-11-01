@@ -6,53 +6,14 @@
                     <v-card-title>{{ value.title }}</v-card-title>
                     <v-card-text>
                         <v-radio-group v-model="value.radioGroup">
-                            <v-radio v-for="n in value.options" :key="n.option" :label="`${n.option}`" :value="n.option"
+                            <v-radio v-for="n in value.options" :key="n.option" :label="`${n.option}`" :value="n.option" :disabled="show"
                                 @click="vote(value.id, value.radioGroup)">
                             </v-radio>
                         </v-radio-group>
                         <v-card-actions>
-                            <div class="text-center">
-                                <v-dialog v-model="dialog" width="500">
-                                    <template v-slot:activator="{ on, attrs }">
-                                        <v-btn text v-bind="attrs" v-on="on">Edit Poll</v-btn>
-                                    </template>
-                            
-                                    <v-card>
-                                        <v-card-title class="text-h5 grey lighten-3">
-                                            Edit Poll
-                                        </v-card-title>
-                            
-                                        <v-card-text>
-                                            <v-form>
-                                                <v-text-field v-model="title"></v-text-field>
-                                                <div class="d-flex">
-                                                    <v-text-field v-model="option" label="Add New Option"></v-text-field>
-                                                    <v-spacer></v-spacer>
-                                                    <v-icon style="cursor: pointer;">mdi-plus-box</v-icon>
-                                                </div>
-                                            </v-form>
-                                            <v-list-item>
-                                                <v-list-item-content>
-                                                    <v-list-item-title>Added options</v-list-item-title>
-                                                    <!-- <div class="d-flex" v-for="(val, i) in options" :key="i">
-                                                        <v-list-item-subtitle>{{'- '+val.option}}</v-list-item-subtitle>
-                                                        <v-icon style="cursor: pointer;" @click="deleteOption(value.id, val.option, i, index)">mdi-delete</v-icon>
-                                                    </div> -->
-                                                </v-list-item-content>
-                                            </v-list-item>
-                                        </v-card-text>
-                            
-                                        <v-divider></v-divider>
-                            
-                                        <v-card-actions>
-                                            <v-spacer></v-spacer>
-                                            <v-btn color="primary" text @click="save">Save Changes</v-btn>
-                                        </v-card-actions>
-                                    </v-card>
-                                </v-dialog>
-                            </div>
+                            <v-btn text v-if="show">Edit</v-btn>
                             <v-spacer></v-spacer>
-                            <v-btn text @click="deletePoll(value._id, index)">delete</v-btn>
+                            <v-btn text @click="deletePoll(value._id, index)" v-if="show">delete</v-btn>
                         </v-card-actions>
                     </v-card-text>
                 </v-card>
@@ -80,6 +41,10 @@ export default {
     computed: {
         poll() {
             return this.$store.getters.poll;
+        },
+        show(){
+            let show = localStorage.getItem('show')
+            return JSON.parse(show);
         }
     },
     methods: {

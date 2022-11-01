@@ -11,7 +11,6 @@ export default new Vuex.Store({
     existedUser: null, 
     snackBar: false, 
     message: '', 
-    logUser: false,
     poll: [],
     start: 0,
     end: 31,
@@ -28,6 +27,9 @@ export default new Vuex.Store({
     },
     logUser: (state)=>{
       return state.logUser
+    },
+    show:(state)=>{
+      return state.show
     }
   },
   mutations: {
@@ -36,10 +38,18 @@ export default new Vuex.Store({
       state.existedUser=payload.resp;
       if(state.existedUser.error===0){
         let decode = VueJwtDecode.decode(payload.resp.token);
-        console.log(decode);
-        // localStorage.setItem('user', decode);
-        state.logUser=true;
-        state.show=false;
+        localStorage.setItem('user', decode.role);
+        localStorage.setItem('show', true)
+        localStorage.setItem('logUser', true)
+        let role = localStorage.getItem('user');
+        if(role==='admin'){
+          state.show=true;
+          console.log(state.show);
+        }
+        else{
+          localStorage.setItem('show', false);
+          console.log(state.show);
+        }
         payload.router.push({path: '/dashBoard', component: payload.component});
         state.message='login successfully';
         state.snackBar=true;
@@ -47,7 +57,6 @@ export default new Vuex.Store({
       else{
         state.message= 'password or email do not match enter again';
         state.snackBar=true;
-        state.show=true;
       }
     },
     ADD_USER: (state, payload)=>{
@@ -69,11 +78,11 @@ export default new Vuex.Store({
       console.log(data.data);
     },
     LOGOUT: (state, payload)=>{
-      state.logUser=false;
       console.log(payload);
-      payload.router.push({path: '/', component: payload.component});
       state.message='logged out successfully';
       state.snackBar=true;
+      localStorage.clear();
+      payload.router.push({path: '/Login', component: payload.component});
     },
     LIST_POLLS: (state, payload)=>{
       state.poll= payload.data.data.slice(state.start, state.end);
@@ -90,7 +99,6 @@ export default new Vuex.Store({
     },
     DELETE_POLL: (state, payload)=>{
       const resp = JSON.parse(payload);
-      console.log(resp.error, resp.index);
       if (resp.error===0) {
         state.poll.splice(resp.index, 1);
         state.message='Poll deleted successfully'

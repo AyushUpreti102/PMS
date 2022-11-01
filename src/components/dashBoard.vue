@@ -8,7 +8,7 @@
       width="500"
     >
       <template v-slot:activator="{ on, attrs }">
-        <v-btn style="position: absolute; right: 20px;" depressed color="warning" v-bind="attrs" v-on="on">Add Poll</v-btn>
+        <v-btn style="position: absolute; right: 20px;" depressed color="warning" v-bind="attrs" v-on="on" v-if="show">Add Poll</v-btn>
       </template>
 
       <v-card>
@@ -62,7 +62,7 @@
 <script>
 import PollCard from './PollCard.vue';
 import NavBar from './navBar.vue';
-import HomePage from './HomePage.vue';
+import Login from './LoginPage.vue';
 
 export default {
     name: "dashBoard",
@@ -72,6 +72,10 @@ export default {
         },
         message() {
             return this.$store.getters.message;
+        },
+        show(){
+            let show = localStorage.getItem('show')
+            return JSON.parse(show);
         }
     },
     mounted() {
@@ -114,7 +118,7 @@ export default {
             this.pollOptions.splice(i, 1);
         },
         logout(){
-            this.$store.dispatch('logout', {router: this.$router, component: HomePage})
+            this.$store.dispatch('logout', {router: this.$router, component: Login})
         },
         listPolls(){
             this.$store.dispatch('listPolls')
