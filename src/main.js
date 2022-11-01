@@ -1,22 +1,31 @@
 import Vue from 'vue'
 import App from './App.vue'
 import vuetify from './plugins/vuetify'
-import store from './store'
 import VueRouter from 'vue-router'
-import LoginPage from './components/LoginPage.vue'
-import SignUp from './components/SignUp.vue'
-import HomePage from './components/HomePage.vue'
-import dashBoard from './components/dashBoard.vue'
-
+import routes from './routes'
+import store from './store/index'
 Vue.use(VueRouter);
+const router = new VueRouter({
+  routes,
+})
 
-const routes = [
-    {path: '/', component: HomePage},
-    {path: '/Signup', component: SignUp},
-    {path: '/LoginPage', component: LoginPage},
-    {path:'/dashBoard', component: dashBoard},
-]
-const router = new VueRouter({routes: routes});
+router.beforeEach((to, from, next)=>{
+  if (store.getters.logUser && (to.path==='/Login' || to.path==='/Signup')) {
+    if(from.path==='/dashBoard'){
+      next('/');
+    }
+    if(from.path==='/'){
+      next('/dashBoard');
+    }
+    console.log(from);
+  }
+  else if (!store.getters.logUser && (to.path==='/dashBoard')) {
+    next('/Login')
+  }
+  else{
+    next();
+  }
+})
 
 Vue.config.productionTip = false
 

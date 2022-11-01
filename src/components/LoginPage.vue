@@ -44,13 +44,16 @@ export default {
         },
         message() {
             return this.$store.getters.message;
+        },
+        logUser() {
+            return this.$store.getters.logUser;
         }
     },
     methods: {
         login() {
             this.$store.dispatch('login', { loginDetails: this.loginDetails, router: this.$router, component: dashBoard });
-            if (this.users.logUser) {
-                console.log(this.users.logUser);
+            if (this.logUser) {
+                console.log(this.logUser);
             }
         },
     },

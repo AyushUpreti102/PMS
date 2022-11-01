@@ -4,7 +4,7 @@
             <h2>Poll Management System</h2>
         </v-app-bar-title>
         <v-spacer></v-spacer>
-        <router-link to="/LoginPage" class="btn btn1">
+        <router-link to="/Login" class="btn btn1">
             <slot name="Login"></slot>
             </router-link>
             <router-link to="/Signup" class="btn btn2">

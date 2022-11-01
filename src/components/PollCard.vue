@@ -14,7 +14,7 @@
                             <div class="text-center">
                                 <v-dialog v-model="dialog" width="500">
                                     <template v-slot:activator="{ on, attrs }">
-                                        <v-btn text v-bind="attrs" v-on="on" @click="editCard(value.title, value.options ,index)">Edit Poll</v-btn>
+                                        <v-btn text v-bind="attrs" v-on="on">Edit Poll</v-btn>
                                     </template>
                             
                                     <v-card>
@@ -28,16 +28,16 @@
                                                 <div class="d-flex">
                                                     <v-text-field v-model="option" label="Add New Option"></v-text-field>
                                                     <v-spacer></v-spacer>
-                                                    <v-icon style="cursor: pointer;" @click="addNewOptionsToPoll(value.id, option, index)">mdi-plus-box</v-icon>
+                                                    <v-icon style="cursor: pointer;">mdi-plus-box</v-icon>
                                                 </div>
                                             </v-form>
                                             <v-list-item>
                                                 <v-list-item-content>
                                                     <v-list-item-title>Added options</v-list-item-title>
-                                                    <div class="d-flex" v-for="(val, i) in options" :key="i">
+                                                    <!-- <div class="d-flex" v-for="(val, i) in options" :key="i">
                                                         <v-list-item-subtitle>{{'- '+val.option}}</v-list-item-subtitle>
                                                         <v-icon style="cursor: pointer;" @click="deleteOption(value.id, val.option, i, index)">mdi-delete</v-icon>
-                                                    </div>
+                                                    </div> -->
                                                 </v-list-item-content>
                                             </v-list-item>
                                         </v-card-text>
@@ -52,12 +52,15 @@
                                 </v-dialog>
                             </div>
                             <v-spacer></v-spacer>
-                            <v-btn text @click="deletePoll(value.id, index)">delete</v-btn>
+                            <v-btn text @click="deletePoll(value._id, index)">delete</v-btn>
                         </v-card-actions>
                     </v-card-text>
                 </v-card>
             </v-flex>
         </v-layout>
+        <div class="text-center">
+            <v-pagination v-model="page" :length="12" style="margin-top: 10px;" @input="next"></v-pagination>
+        </div>
     </v-container>
 </template>
 <script>
@@ -68,7 +71,10 @@ export default {
             dialog: false,
             title: '',
             options: null,
-            option: ''
+            option: '',
+            page: 1,
+            totalPage: 12,
+            itemsPerPage: 31,
         }
     },
     computed: {
@@ -81,12 +87,13 @@ export default {
             this.$store.dispatch('vote', {id: id, radioGroup: radioGroup});
         },
         deletePoll(id, i){
+            console.log(id, i);
             this.$store.dispatch('deletePoll', {id: id, idx: i})
         },
         editCard(title, options,i){
-            this.title=title;
-            this.options=options;
-            console.log(i, this.options);
+            // this.title=title;
+            // this.options=options;
+            console.log(i, title, options);
         },
         deleteOption(id, option, i, index){
             console.log(id, option, i);
@@ -99,6 +106,12 @@ export default {
         },
         save(){
             this.dialog=false;
+        },
+        next(){
+            let page = (this.page-1)*this.itemsPerPage;
+            let items = (this.page-1)*this.itemsPerPage+this.itemsPerPage
+            this.$store.dispatch('pagination', {start: page, end: items});
+            this.$emit('changePage')
         }
     }
 }

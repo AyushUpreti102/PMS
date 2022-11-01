@@ -13,7 +13,9 @@
 
       <v-card>
         <v-card-title class="text-h5 grey lighten-3">
-            Add Poll
+            <p>Add Poll</p>
+            <v-spacer></v-spacer>
+            <v-btn text style="position: relative; bottom: 10px;" @click="clearPoll">X</v-btn>
         </v-card-title>
 
         <v-card-text>
@@ -26,7 +28,13 @@
             <v-list-item>
                 <v-list-item-content>
                     <v-list-item-title>Added options</v-list-item-title>
-                    <v-list-item-subtitle v-for="(val, i) in pollOptions" :key="i">{{'- '+val.option}}</v-list-item-subtitle>
+                    <v-list-item-subtitle v-for="(val, i) in pollOptions" :key="i">
+                        <div class="d-flex">
+                            <p>{{'- '+val.option}}</p>
+                            <v-spacer></v-spacer>
+                            <v-icon style="cursor: pointer;" @click="deleteOption(i)">mdi-delete</v-icon>
+                        </div>
+                    </v-list-item-subtitle>
                 </v-list-item-content>
             </v-list-item>
           </v-form>
@@ -47,7 +55,7 @@
                     <v-btn right text @click="logout">Logout</v-btn>
                 </template>
             </NavBar>
-            <PollCard />
+            <PollCard @changePage="change"/>
         </v-main>
     </v-container>
 </template>
@@ -65,6 +73,9 @@ export default {
         message() {
             return this.$store.getters.message;
         }
+    },
+    mounted() {
+        this.$store.dispatch('listPolls');
     },
     data() {
         return {
@@ -94,10 +105,21 @@ export default {
             this.pollOptions.push({option: JSON.parse(JSON.stringify(this.option)), vote: 0});
             this.option=''
         },
+        clearPoll(){
+            this.pollOptions.splice(0, this.pollOptions.length);
+            this.title=''
+            this.dialog=false;
+        },
+        deleteOption(i){
+            this.pollOptions.splice(i, 1);
+        },
         logout(){
             this.$store.dispatch('logout', {router: this.$router, component: HomePage})
         },
         listPolls(){
+            this.$store.dispatch('listPolls')
+        },
+        change(){
             this.$store.dispatch('listPolls')
         }
     },

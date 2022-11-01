@@ -1,6 +1,6 @@
 <template>
     <v-container>
-        <v-snackbar v-model="users.snackBar" timeout="2000" color="success" top>{{ users.message }}</v-snackbar>
+        <v-snackbar v-model="snackBar" timeout="2000" color="success" top>{{ message }}</v-snackbar>
         <v-main>
             <NavBar>
                 <template v-slot:Login>
@@ -21,8 +21,11 @@ export default {
     name: "HomePage",
     components: { NavBar },
     computed: {
-        users() {
-            return this.$store.getters.users;
+        snackBar() {
+            return this.$store.getters.snackBar;
+        },
+        message() {
+            return this.$store.getters.message;
         }
     },
 }

@@ -30,6 +30,7 @@
 </template>
 <script>
 import NavBar from './navBar.vue';
+import LoginPage from './LoginPage.vue';
 export default {
     name: "SignUp",
     data() {
@@ -48,7 +49,7 @@ export default {
     },
     methods: {
         addUser() {
-            this.$store.dispatch('addUser', this.signUpDetails);
+            this.$store.dispatch('addUser', { details: JSON.stringify(this.signUpDetails), router: this.$router, component: LoginPage });
         }
     },
     components: { NavBar }
