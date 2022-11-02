@@ -15,7 +15,7 @@ export default new Vuex.Store({
     } , 
     poll: [],
     start: 0,
-    end: 31,
+    end: 12,
   },
   getters: {
     poll: (state)=>{
@@ -80,13 +80,6 @@ export default new Vuex.Store({
       state.poll.push({_id: data.data.id, title: data.data.title, options: data.data.options, radioGroup: null});
       console.log(data);
     },
-    LOGOUT: (state, payload)=>{
-      console.log(payload);
-      state.snackBar.message='logged out successfully';
-      state.snackBar.snack=true;
-      localStorage.clear();
-      payload.router.push({path: '/Login', component: payload.component});
-    },
     LIST_POLLS: (state, payload)=>{
       state.poll= payload.data.data.slice(state.start, state.end);
     },
@@ -95,21 +88,6 @@ export default new Vuex.Store({
       state;
       console.log(resp);
     },
-    VALIDATE(state, payload){
-      state.snackBar.message=payload
-      state.snackBar.snackBar=true;
-    },
-    DELETE_POLL: (state, payload)=>{
-      const resp = JSON.parse(payload);
-      if (resp.error===0) {
-        state.poll.splice(resp.index, 1);
-        state.snackBar.message='Poll deleted successfully'
-        state.snackBar.snack=true;
-      } else {
-        state.snackBar.snack=true;
-        state.snackBar.message='! invalid poll'
-      }
-    },  
     CHANGE_TITLE: (state, payload)=>{
       let resp = JSON.parse(payload)
       if(resp.resp.error===0){
@@ -129,6 +107,28 @@ export default new Vuex.Store({
         console.log(resp, payload.pollIndex, payload.option);
         state.poll[payload.pollIndex].options.push({option: payload.option, vote: 0})
       }
+    },
+    DELETE_POLL: (state, payload)=>{
+      const resp = JSON.parse(payload);
+      if (resp.error===0) {
+        state.poll.splice(resp.index, 1);
+        state.snackBar.message='Poll deleted successfully'
+        state.snackBar.snack=true;
+      } else {
+        state.snackBar.snack=true;
+        state.snackBar.message='! invalid poll'
+      }
+    },  
+    LOGOUT: (state, payload)=>{
+      console.log(payload);
+      state.snackBar.message='logged out successfully';
+      state.snackBar.snack=true;
+      localStorage.clear();
+      payload.router.push({path: '/Login', component: payload.component});
+    },
+    VALIDATE(state, payload){
+      state.snackBar.message=payload
+      state.snackBar.snackBar=true;
     },
     PAGINATION: (state, payload)=>{
       state.start=payload.start;
@@ -159,9 +159,6 @@ export default new Vuex.Store({
         context.commit('ADD_POLL', JSON.stringify(resp.data));
       })
     },
-    logout: (context, payload)=>{
-      context.commit('LOGOUT', payload);
-    },
     listPolls: (context)=>{
       axios.get('https://secure-refuge-14993.herokuapp.com/list_polls').then((resp)=>{
         context.commit('LIST_POLLS', resp);
@@ -172,14 +169,6 @@ export default new Vuex.Store({
         context.commit('VOTE', JSON.stringify(resp));
       }).catch((err)=>{
         console.log(err);
-      })
-    },
-    validate: (context, payload)=>{
-      context.commit('VALIDATE', payload);
-    },
-    deletePoll: (context, payload)=>{
-      axios.get(`https://secure-refuge-14993.herokuapp.com/delete_poll?id=${payload.id}`).then((resp)=>{
-        context.commit('DELETE_POLL', JSON.stringify({error: resp.data.error, index: payload.idx}));
       })
     },
     changeTitle: (context, payload)=>{
@@ -197,6 +186,17 @@ export default new Vuex.Store({
       axios.get(`https://secure-refuge-14993.herokuapp.com/add_new_option?id=${payload.id}&option_text=${payload.option}`).then((resp)=>{
         context.commit('ADD_NEW_OPTIONS_TO_POLL', {data: JSON.stringify(resp.data), pollIndex: payload.pollIndex, option: payload.option});
       })
+    },
+    deletePoll: (context, payload)=>{
+      axios.get(`https://secure-refuge-14993.herokuapp.com/delete_poll?id=${payload.id}`).then((resp)=>{
+        context.commit('DELETE_POLL', JSON.stringify({error: resp.data.error, index: payload.idx}));
+      })
+    },
+    logout: (context, payload)=>{
+      context.commit('LOGOUT', payload);
+    },
+    validate: (context, payload)=>{
+      context.commit('VALIDATE', payload);
     },
     pagination: (context, payload)=>{
       context.commit('PAGINATION', payload);

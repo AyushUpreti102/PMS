@@ -35,8 +35,7 @@ export default {
     name: "LoginPage",
     data() {
         return {
-            loginDetails: { userName: '', password: null },
-            snack: false
+            loginDetails: { userName: '', password: null }
         }
     },
     computed: {
@@ -50,7 +49,6 @@ export default {
     methods: {
         login() {
             this.$store.dispatch('login', { loginDetails: this.loginDetails, router: this.$router, component: dashBoard });
-            console.log(this.snackBar);
         },
     },
     components: { NavBar }

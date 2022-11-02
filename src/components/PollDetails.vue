@@ -67,8 +67,37 @@ export default {
         }
     },
     methods: {
+        edit() {
+            if (this.btn === 'Edit') {
+                this.pollOptions = this.options;
+                this.title = this.pollTitle;
+                console.log(this.pollOptions);
+            }
+        },
+        addOptions() {
+            if(this.btn === 'Add_Poll'){
+                this.pollOptions.push({ option: JSON.parse(JSON.stringify(this.option)), vote: 0 });
+                this.option = ''
+            }
+            if(this.btn === 'Edit'){
+                this.pollOptions.push({ option: JSON.parse(JSON.stringify(this.option)), vote: 0 });
+                this.option = ''
+            }
+        },
+        deleteOption(i, val) {
+            if (this.btn === 'Add_Poll') {
+                this.pollOptions.splice(i, 1);
+            }
+            if (this.btn === 'Edit') {
+                this.pollOptions.splice(i, 1);
+                this.delOption = val
+                console.log(this.pollOptions);
+                console.log(this.options);
+            }
+        },
         task() {
-            if (this.btn === 'Add Poll') {
+            if (this.btn === 'Add_Poll') {
+                // this.$store.dispatch('addNewOptionsToPoll', {id: this.id, index: this.idx, option: this.option});
                 if (this.title !== '') {
                     if (this.pollOptions.length !== 0) {
                         this.dialog = false
@@ -95,25 +124,6 @@ export default {
                     this.dialog = false;
                 }
                 this.dialog = false;
-            }
-        },
-        addOptions() {
-            this.pollOptions.push({ option: JSON.parse(JSON.stringify(this.option)), vote: 0 });
-            this.option = ''
-        },
-        deleteOption(i, val) {
-            if (this.btn === 'Add Poll') {
-                this.pollOptions.splice(i, 1);
-            }
-            if (this.btn === 'Edit') {
-                this.pollOptions.splice(i, 1);
-                this.delOption = val
-            }
-        },
-        edit() {
-            if (this.btn === 'Edit') {
-                this.pollOptions = this.options;
-                this.title = this.pollTitle;
             }
         },
         closePoll() {

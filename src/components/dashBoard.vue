@@ -38,7 +38,7 @@ export default {
     data() {
         return {
             dialog: false,
-            btn: 'Add Poll',
+            btn: 'Add_Poll',
         };
     },
     methods: {

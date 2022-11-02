@@ -32,7 +32,7 @@ export default {
         return {
             page: 1,
             totalPage: 12,
-            itemsPerPage: 31,
+            itemsPerPage: 12,
             btn: 'Edit'
         };
     },

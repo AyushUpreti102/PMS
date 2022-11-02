@@ -16,11 +16,6 @@
 <script>
 export default {
     name: 'navBar',
-    computed: {
-        users() {
-            return this.$store.getters.users;
-        }
-    },
 }
 </script>
 
