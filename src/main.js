@@ -6,24 +6,24 @@ import routes from './routes'
 import store from './store/index'
 Vue.use(VueRouter);
 const router = new VueRouter({
+  mode: 'history',
   routes,
 })
 
 router.beforeEach((to, from, next)=>{
-  let logUser = localStorage.getItem('logUser')
-  if (logUser && (to.path==='/Login' || to.path==='/Signup')) {
-    if(from.path==='/dashBoard'){
-      next('/');
+  let logUser = JSON.parse(localStorage.getItem('logUser'));
+  console.log(logUser);
+  if (logUser!==true && (to.path==='/dashBoard')) {
+    next('/')
+    console.log(logUser);
+  }
+  else if (logUser===true && (to.path==='/Login' || to.path==='/Signup')) {
+    if (from.path==='/dashBoard') {
+      next('/')
     }
     if(from.path==='/'){
-      next('/dashBoard');
+      next('/dashBoard')
     }
-  }
-  else if (!logUser && (to.path==='/dashBoard')) {
-    next('/Login')
-  }
-  else if (!logUser && (to.path==='/Login')) {
-    next('/');
   }
   else{
     next();

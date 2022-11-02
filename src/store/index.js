@@ -9,8 +9,10 @@ export default new Vuex.Store({
     show: true,
     newUser: null, 
     existedUser: null, 
-    snackBar: false, 
-    message: '', 
+    snackBar:{
+      snack: false,
+      message: '', 
+    } , 
     poll: [],
     start: 0,
     end: 31,
@@ -20,7 +22,7 @@ export default new Vuex.Store({
       return state.poll;
     },
     snackBar: (state)=>{
-      state.snackBar
+      return state.snackBar
     },
     message: (state)=>{
       return state.message
@@ -51,12 +53,13 @@ export default new Vuex.Store({
           console.log(state.show);
         }
         payload.router.push({path: '/dashBoard', component: payload.component});
-        state.message='login successfully';
-        state.snackBar=true;
+        state.snackBar.message='login successfully';
+        state.snackBar.snack=true;
+        console.log(state.snackBar);
       }
       else{
-        state.message= 'password or email do not match enter again';
-        state.snackBar=true;
+        state.snackBar.message = 'password or email do not match enter again';
+        state.snackBar.snack=true;
       }
     },
     ADD_USER: (state, payload)=>{
@@ -64,55 +67,60 @@ export default new Vuex.Store({
       state.newUser= payload.resp
       if(payload.resp.error===0){
         payload.router.push({path: '/Login', component: payload.component})
-        state.message='Signup completed'
-        state.snackBar=true;
+        state.snackBar.message='Signup completed'
+        state.snackBar.snack=true;
       }
       else{
-        state.message=payload.data.message;
-        state.snackBar=true;
+        state.snackBar.message=payload.data.message;
+        state.snackBar.snack=true;
       }
     },
     ADD_POLL: (state, payload)=>{
       let data = JSON.parse(payload)
-      state.poll.push({id: data.data.id, title: data.data.title, options: data.data.options, radioGroup: null});
-      console.log(data.data);
+      state.poll.push({_id: data.data.id, title: data.data.title, options: data.data.options, radioGroup: null});
+      console.log(data);
     },
     LOGOUT: (state, payload)=>{
       console.log(payload);
-      state.message='logged out successfully';
-      state.snackBar=true;
+      state.snackBar.message='logged out successfully';
+      state.snackBar.snack=true;
       localStorage.clear();
       payload.router.push({path: '/Login', component: payload.component});
     },
     LIST_POLLS: (state, payload)=>{
       state.poll= payload.data.data.slice(state.start, state.end);
-      console.log(payload.data.data);
     },
     VOTE:(state, payload)=>{
       let resp =JSON.parse(payload);
-      state.poll;
+      state;
       console.log(resp);
     },
     VALIDATE(state, payload){
-      state.message=payload
-      state.snackBar=true;
+      state.snackBar.message=payload
+      state.snackBar.snackBar=true;
     },
     DELETE_POLL: (state, payload)=>{
       const resp = JSON.parse(payload);
       if (resp.error===0) {
         state.poll.splice(resp.index, 1);
-        state.message='Poll deleted successfully'
-        state.snackBar=true;
+        state.snackBar.message='Poll deleted successfully'
+        state.snackBar.snack=true;
       } else {
-        state.snackBar=true;
-        state.message='! invalid poll'
+        state.snackBar.snack=true;
+        state.snackBar.message='! invalid poll'
       }
     },  
+    CHANGE_TITLE: (state, payload)=>{
+      let resp = JSON.parse(payload)
+      if(resp.resp.error===0){
+        state.poll[resp.index].title=resp.title
+      }
+    },
     DELETE_OPTION: (state, payload)=>{
-      let resp = JSON.parse(payload.data);
-      if (resp.error===0) {
-        console.log(resp, payload.pollIndex, payload.optionIndex);
-        state.poll[payload.pollIndex].options.splice(payload.optionIndex, 1);
+      let resp = JSON.parse(payload);
+      console.log(resp);
+      if(resp.error===0){
+        //
       }
     },
     ADD_NEW_OPTIONS_TO_POLL: (state, payload)=>{
@@ -174,9 +182,15 @@ export default new Vuex.Store({
         context.commit('DELETE_POLL', JSON.stringify({error: resp.data.error, index: payload.idx}));
       })
     },
-    deleteOption: (context, payload)=>{
-      axios.get(`https://secure-refuge-14993.herokuapp.com/delete_poll_option?id=${payload.id}&option_text=${payload.option}`).then((resp)=>{
-        context.commit('DELETE_OPTION', {data: JSON.stringify(resp.data), pollIndex: payload.pollIndex, optionIndex: payload.optionIndex});
+    changeTitle: (context, payload)=>{
+      axios.get(`https://secure-refuge-14993.herokuapp.com/update_poll_title?id=${payload.pollId}&title=${payload.pollTitle}`).then((resp)=>{
+        context.commit('CHANGE_TITLE', JSON.stringify({resp: resp.data, title: payload.pollTitle, index:payload.index}));
+      })
+    },
+    deletePollOptions: (context, payload)=>{
+      console.log(payload,payload.pollId,payload.option);
+      axios.get(`https://secure-refuge-14993.herokuapp.com/delete_poll_option?id=${payload.pollId}&option_text=${payload.option}`).then((resp)=>{
+        context.commit('DELETE_OPTION', JSON.stringify({resp: resp.data, pollIndex: payload.index, options: payload.options}));
       })
     },
     addNewOptionsToPoll: (context, payload)=>{

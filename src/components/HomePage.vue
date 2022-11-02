@@ -1,6 +1,6 @@
 <template>
     <v-container>
-        <v-snackbar v-model="snackBar" timeout="2000" color="success" top>{{ message }}</v-snackbar>
+        <v-snackbar v-model="snackBar.snack" timeout="2000" color="success" top>{{ snackBar.message }}</v-snackbar>
         <v-main>
             <NavBar>
                 <template v-slot:Login>

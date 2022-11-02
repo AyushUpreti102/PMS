@@ -7,11 +7,11 @@
                     <v-card-text>
                         <v-radio-group v-model="value.radioGroup">
                             <v-radio v-for="n in value.options" :key="n.option" :label="`${n.option}`" :value="n.option" :disabled="show"
-                                @click="vote(value.id, value.radioGroup)">
+                                @click="vote(value._id, value.radioGroup)">
                             </v-radio>
                         </v-radio-group>
                         <v-card-actions>
-                            <v-btn text v-if="show">Edit</v-btn>
+                            <PollDetails :btn="btn" :options="value.options" :pollTitle="value.title" :id="value._id" :idx="index"></PollDetails>
                             <v-spacer></v-spacer>
                             <v-btn text @click="deletePoll(value._id, index)" v-if="show">delete</v-btn>
                         </v-card-actions>
@@ -25,60 +25,43 @@
     </v-container>
 </template>
 <script>
+import PollDetails from './PollDetails.vue';
 export default {
-    name: 'PollCard',
+    name: "PollCard",
     data() {
         return {
-            dialog: false,
-            title: '',
-            options: null,
-            option: '',
             page: 1,
             totalPage: 12,
             itemsPerPage: 31,
-        }
+            btn: 'Edit'
+        };
     },
     computed: {
         poll() {
             return this.$store.getters.poll;
         },
-        show(){
-            let show = localStorage.getItem('show')
+        show() {
+            let show = localStorage.getItem("show");
             return JSON.parse(show);
         }
     },
     methods: {
         vote(id, radioGroup) {
-            this.$store.dispatch('vote', {id: id, radioGroup: radioGroup});
+            this.$store.dispatch("vote", { id: id, radioGroup: radioGroup });
         },
-        deletePoll(id, i){
+        deletePoll(id, i) {
             console.log(id, i);
-            this.$store.dispatch('deletePoll', {id: id, idx: i})
+            this.$store.dispatch("deletePoll", { id: id, idx: i });
         },
-        editCard(title, options,i){
-            // this.title=title;
-            // this.options=options;
-            console.log(i, title, options);
+        next() {
+            let page = (this.page - 1) * this.itemsPerPage;
+            let items = (this.page - 1) * this.itemsPerPage + this.itemsPerPage;
+            this.$store.dispatch("pagination", { start: page, end: items });
+            this.$emit("changePage");
         },
-        deleteOption(id, option, i, index){
-            console.log(id, option, i);
-            this.$store.dispatch('deleteOption', {pollIndex: index, optionIndex: i, id: id, option: option});
-        },
-        addNewOptionsToPoll(id, option, index){
-            // this.options.lenght=this.options.lenght+1;
-            this.$store.dispatch('addNewOptionsToPoll', {pollIndex: index, id: id, option: option});
-            this.option='';
-        },
-        save(){
-            this.dialog=false;
-        },
-        next(){
-            let page = (this.page-1)*this.itemsPerPage;
-            let items = (this.page-1)*this.itemsPerPage+this.itemsPerPage
-            this.$store.dispatch('pagination', {start: page, end: items});
-            this.$emit('changePage')
-        }
-    }
+
+    },
+    components: { PollDetails }
 }
 </script>
 <style scoped>

@@ -10,7 +10,7 @@
                 </template>
             </NavBar>
         </v-main>
-        <v-snackbar v-model="snackBar" timeout="2000" color="success" top>{{message}}</v-snackbar>
+        <v-snackbar v-model="snackBar.snack" timeout="2000" color="success" top>{{snackBar.message}}</v-snackbar>
         <v-layout>
             <v-flex>
                 <v-card elevation="0" width="60%" class="mx-auto">
@@ -36,6 +36,7 @@ export default {
     data() {
         return {
             loginDetails: { userName: '', password: null },
+            snack: false
         }
     },
     computed: {
@@ -45,16 +46,11 @@ export default {
         message() {
             return this.$store.getters.message;
         },
-        logUser() {
-            return this.$store.getters.logUser;
-        }
     },
     methods: {
         login() {
             this.$store.dispatch('login', { loginDetails: this.loginDetails, router: this.$router, component: dashBoard });
-            if (this.logUser) {
-                console.log(this.logUser);
-            }
+            console.log(this.snackBar);
         },
     },
     components: { NavBar }
