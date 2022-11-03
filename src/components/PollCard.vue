@@ -43,14 +43,16 @@ export default {
         show() {
             let show = localStorage.getItem("show");
             return JSON.parse(show);
-        }
+        },
+        snackBar() {
+            return this.$store.getters.snackBar;
+        },
     },
     methods: {
         vote(id, radioGroup) {
             this.$store.dispatch("vote", { id: id, radioGroup: radioGroup });
         },
         deletePoll(id, i) {
-            console.log(id, i);
             this.$store.dispatch("deletePoll", { id: id, idx: i });
         },
         next() {

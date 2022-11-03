@@ -2,30 +2,27 @@
     <v-container>
         <v-snackbar v-model="snackBar.snack" timeout="2000" color="success" top>{{snackBar.message}}</v-snackbar>
         <v-main>
-            <NavBar>
+            <navBar>
                 <template v-slot:Logout>
-                    <v-btn right text @click="logout">Logout</v-btn>
+                    <ToolTip />
                 </template>
-            </NavBar>
-            <PollDetails :btn="btn" style="position: relative; left: 40vw; bottom: 8vh;"></PollDetails>
+            </navBar>
+            <PollDetails :btn="btn" :condition="true"></PollDetails>
             <PollCard @changePage="change"/>
         </v-main>
     </v-container>
 </template>
 <script>
 import PollCard from './PollCard.vue';
-import NavBar from './navBar.vue';
-import Login from './LoginPage.vue';
+import navBar from './navBar.vue';
 import PollDetails from './PollDetails.vue';
+import ToolTip from './ToolTip.vue';
 
 export default {
     name: "dashBoard",
     computed: {
         snackBar() {
             return this.$store.getters.snackBar;
-        },
-        message() {
-            return this.$store.getters.message;
         },
         show(){
             let show = localStorage.getItem('show')
@@ -42,13 +39,10 @@ export default {
         };
     },
     methods: {
-        logout(){
-            this.$store.dispatch('logout', {router: this.$router, component: Login})
-        },
         change(){
             this.$store.dispatch('listPolls')
         },
     },
-    components: { PollCard, NavBar, PollDetails }
+    components: { PollCard, navBar, PollDetails, ToolTip }
 }
 </script>

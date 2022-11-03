@@ -12,10 +12,8 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next)=>{
   let logUser = JSON.parse(localStorage.getItem('logUser'));
-  console.log(logUser);
-  if (logUser!==true && (to.path==='/dashBoard')) {
+  if (logUser!==true && (to.path==='/dashBoard' || to.path==='/Profile' || to.path==='/List')) {
     next('/')
-    console.log(logUser);
   }
   else if (logUser===true && (to.path==='/Login' || to.path==='/Signup')) {
     if (from.path==='/dashBoard') {

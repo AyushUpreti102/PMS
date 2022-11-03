@@ -2,7 +2,7 @@
     <div class="text-center">
         <v-dialog v-model="dialog" width="500">
             <template v-slot:activator="{ on, attrs }">
-                <v-btn v-bind="attrs" v-on="on" depressed v-if="show" @click="edit">{{ btn }}</v-btn>
+                <v-btn v-bind="attrs" v-on="on" depressed v-if="show" @click="edit" :class="{btnPosition: condition}">{{ btn }}</v-btn>
             </template>
 
             <v-card>
@@ -50,13 +50,14 @@
 <script>
 export default {
     name: 'PollDetails',
-    props: ['btn', 'options', 'pollTitle', 'id', 'idx'],
+    props: ['btn', 'options', 'pollTitle', 'id', 'idx', 'condition'],
     data() {
         return {
             dialog: false,
             title: '',
             option: '',
             pollOptions: [],
+            editOptions: null,
             delOption: ''
         };
     },
@@ -64,24 +65,28 @@ export default {
         show() {
             let show = localStorage.getItem("show");
             return JSON.parse(show);
-        }
+        },
     },
     methods: {
         edit() {
             if (this.btn === 'Edit') {
-                this.pollOptions = this.options;
+                this.pollOptions = this.options.map(el => el);
                 this.title = this.pollTitle;
-                console.log(this.pollOptions);
             }
         },
         addOptions() {
-            if(this.btn === 'Add_Poll'){
+            if (this.btn === 'Add_Poll') {
                 this.pollOptions.push({ option: JSON.parse(JSON.stringify(this.option)), vote: 0 });
                 this.option = ''
             }
-            if(this.btn === 'Edit'){
-                this.pollOptions.push({ option: JSON.parse(JSON.stringify(this.option)), vote: 0 });
-                this.option = ''
+            if (this.btn === 'Edit') {
+                if (this.pollOptions.length === this.options.length + 1) {
+                    alert('one option can be added at a time');
+                }
+                else {
+                    this.pollOptions.push({ option: JSON.parse(JSON.stringify(this.option)), vote: 0 });
+                    this.option = ''
+                }
             }
         },
         deleteOption(i, val) {
@@ -89,15 +94,17 @@ export default {
                 this.pollOptions.splice(i, 1);
             }
             if (this.btn === 'Edit') {
-                this.pollOptions.splice(i, 1);
-                this.delOption = val
-                console.log(this.pollOptions);
-                console.log(this.options);
+                if (this.pollOptions.length === this.options.length) {
+                    this.pollOptions.splice(i, 1);
+                    this.delOption = val
+                }
+                else {
+                    alert('on option can be deleted at a time');
+                }
             }
         },
         task() {
             if (this.btn === 'Add_Poll') {
-                // this.$store.dispatch('addNewOptionsToPoll', {id: this.id, index: this.idx, option: this.option});
                 if (this.title !== '') {
                     if (this.pollOptions.length !== 0) {
                         this.dialog = false
@@ -115,10 +122,12 @@ export default {
             else {
                 if (this.title !== this.pollTitle) {
                     this.$store.dispatch('changeTitle', { pollId: this.id, pollTitle: this.title, index: this.idx });
-                    console.log(this.id, this.title, this.idx);
                 }
-                else if (this.pollOptions.length === this.options.length) {
+                else if (this.pollOptions.length === this.options.length - 1) {
                     this.$store.dispatch('deletePollOptions', { pollId: this.id, options: this.pollOptions, index: this.idx, option: this.delOption })
+                }
+                else if (this.pollOptions.length === this.options.length + 1) {
+                    this.$store.dispatch('addNewOptionsToPoll', { id: this.id, index: this.idx, option: this.pollOptions[this.pollOptions.length - 1].option, options: this.pollOptions });
                 }
                 else {
                     this.dialog = false;
@@ -136,6 +145,13 @@ export default {
                 this.dialog = false;
             }
         },
-    }
+    },
 }
 </script>
+<style scoped>
+.btnPosition {
+    position: relative;
+    left: 40vw;
+    bottom: 8vh;
+}
+</style>

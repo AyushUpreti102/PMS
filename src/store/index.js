@@ -6,14 +6,12 @@ import VueJwtDecode from 'vue-jwt-decode'
 Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
-    show: true,
-    newUser: null, 
-    existedUser: null, 
     snackBar:{
       snack: false,
       message: '', 
     } , 
     poll: [],
+    users: [],
     start: 0,
     end: 12,
   },
@@ -24,38 +22,28 @@ export default new Vuex.Store({
     snackBar: (state)=>{
       return state.snackBar
     },
-    message: (state)=>{
-      return state.message
-    },
-    logUser: (state)=>{
-      return state.logUser
-    },
-    show:(state)=>{
-      return state.show
+    users: (state)=>{
+      return state.users;
     }
   },
   mutations: {
     LOGIN: (state, payload)=>{
-      console.log(payload.resp);
-      state.existedUser=payload.resp;
-      if(state.existedUser.error===0){
-        let decode = VueJwtDecode.decode(payload.resp.token);
+      let resp = payload;
+      if(resp.resp.error===0){
+        let decode = VueJwtDecode.decode(resp.resp.token);
         localStorage.setItem('user', decode.role);
-        localStorage.setItem('show', true)
+        localStorage.setItem('userName', decode.username);
         localStorage.setItem('logUser', true)
         let role = localStorage.getItem('user');
         if(role==='admin'){
-          state.show=true;
-          console.log(state.show);
+          localStorage.setItem('show', true)
         }
         else{
           localStorage.setItem('show', false);
-          console.log(state.show);
         }
-        payload.router.push({path: '/dashBoard', component: payload.component});
+        resp.router.push({path: '/dashBoard', component: payload.component});
         state.snackBar.message='login successfully';
         state.snackBar.snack=true;
-        console.log(state.snackBar);
       }
       else{
         state.snackBar.message = 'password or email do not match enter again';
@@ -63,10 +51,9 @@ export default new Vuex.Store({
       }
     },
     ADD_USER: (state, payload)=>{
-      console.log(payload.resp.error);
-      state.newUser= payload.resp
-      if(payload.resp.error===0){
-        payload.router.push({path: '/Login', component: payload.component})
+      let resp = payload
+      if(resp.resp.error===0){
+        resp.router.push({path: '/Login', component: payload.component})
         state.snackBar.message='Signup completed'
         state.snackBar.snack=true;
       }
@@ -78,7 +65,6 @@ export default new Vuex.Store({
     ADD_POLL: (state, payload)=>{
       let data = JSON.parse(payload)
       state.poll.push({_id: data.data.id, title: data.data.title, options: data.data.options, radioGroup: null});
-      console.log(data);
     },
     LIST_POLLS: (state, payload)=>{
       state.poll= payload.data.data.slice(state.start, state.end);
@@ -86,7 +72,7 @@ export default new Vuex.Store({
     VOTE:(state, payload)=>{
       let resp =JSON.parse(payload);
       state;
-      console.log(resp);
+      resp;
     },
     CHANGE_TITLE: (state, payload)=>{
       let resp = JSON.parse(payload)
@@ -96,16 +82,14 @@ export default new Vuex.Store({
     },
     DELETE_OPTION: (state, payload)=>{
       let resp = JSON.parse(payload);
-      console.log(resp);
-      if(resp.error===0){
-        //
+      if(resp.resp.error===0){
+        state.poll[resp.pollIndex].options= resp.options;
       }
     },
     ADD_NEW_OPTIONS_TO_POLL: (state, payload)=>{
-      let resp = JSON.parse(payload.data);
-      if(resp.error===0){
-        console.log(resp, payload.pollIndex, payload.option);
-        state.poll[payload.pollIndex].options.push({option: payload.option, vote: 0})
+      let resp = JSON.parse(payload);
+      if(resp.resp.error===0){
+        state.poll[resp.index].options=resp.options
       }
     },
     DELETE_POLL: (state, payload)=>{
@@ -120,11 +104,11 @@ export default new Vuex.Store({
       }
     },  
     LOGOUT: (state, payload)=>{
-      console.log(payload);
+      let resp = payload
       state.snackBar.message='logged out successfully';
       state.snackBar.snack=true;
       localStorage.clear();
-      payload.router.push({path: '/Login', component: payload.component});
+      resp.router.push({path: '/Login', component: payload.component});
     },
     VALIDATE(state, payload){
       state.snackBar.message=payload
@@ -133,6 +117,10 @@ export default new Vuex.Store({
     PAGINATION: (state, payload)=>{
       state.start=payload.start;
       state.end=payload.end;
+    },
+    LIST_USERS: (state, payload)=>{
+      let resp = JSON.parse(payload);
+      state.users = resp.data
     }
   },
   actions: {
@@ -143,7 +131,6 @@ export default new Vuex.Store({
     },
     addUser: (context, payload)=>{
       let details = JSON.parse(payload.details);
-      console.log(details.userName, details.role, details.password);
       axios.get(`https://secure-refuge-14993.herokuapp.com/add_user?username=${details.userName}&password=${details.password}&role=${details.role}`).then((resp)=>{
         context.commit('ADD_USER', {resp: resp.data, router: payload.router, component: payload.component});
       })
@@ -177,14 +164,13 @@ export default new Vuex.Store({
       })
     },
     deletePollOptions: (context, payload)=>{
-      console.log(payload,payload.pollId,payload.option);
       axios.get(`https://secure-refuge-14993.herokuapp.com/delete_poll_option?id=${payload.pollId}&option_text=${payload.option}`).then((resp)=>{
         context.commit('DELETE_OPTION', JSON.stringify({resp: resp.data, pollIndex: payload.index, options: payload.options}));
       })
     },
     addNewOptionsToPoll: (context, payload)=>{
       axios.get(`https://secure-refuge-14993.herokuapp.com/add_new_option?id=${payload.id}&option_text=${payload.option}`).then((resp)=>{
-        context.commit('ADD_NEW_OPTIONS_TO_POLL', {data: JSON.stringify(resp.data), pollIndex: payload.pollIndex, option: payload.option});
+        context.commit('ADD_NEW_OPTIONS_TO_POLL', JSON.stringify({resp: resp.data, index: payload.index, options: payload.options}));
       })
     },
     deletePoll: (context, payload)=>{
@@ -200,6 +186,11 @@ export default new Vuex.Store({
     },
     pagination: (context, payload)=>{
       context.commit('PAGINATION', payload);
+    },
+    listUsers: (context)=>{
+      axios.get('https://secure-refuge-14993.herokuapp.com/list_users').then((resp)=>{
+        context.commit('LIST_USERS', JSON.stringify(resp.data));
+      })
     }
   },
   modules: {
