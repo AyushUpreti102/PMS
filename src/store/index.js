@@ -12,8 +12,16 @@ export default new Vuex.Store({
     } , 
     poll: [],
     users: [],
-    start: 0,
-    end: 12,
+    pollPage: {
+      start: 0,
+      end: 12,
+      totalPage: 0
+    },
+    usersPage: {
+      start: 0,
+      end: 72,
+      totalPage: 0
+    }
   },
   getters: {
     poll: (state)=>{
@@ -24,6 +32,12 @@ export default new Vuex.Store({
     },
     users: (state)=>{
       return state.users;
+    },
+    totalPageInPoll: (state)=>{
+      return state.pollPage.totalPage;
+    },
+    totalPageInUser: (state)=>{
+      return state.usersPage.totalPage
     }
   },
   mutations: {
@@ -54,7 +68,7 @@ export default new Vuex.Store({
       let resp = payload
       if(resp.resp.error===0){
         resp.router.push({path: '/Login', component: payload.component})
-        state.snackBar.message='Signup completed'
+        state.snackBar.message='Signup completed please login to continue'
         state.snackBar.snack=true;
       }
       else{
@@ -65,9 +79,12 @@ export default new Vuex.Store({
     ADD_POLL: (state, payload)=>{
       let data = JSON.parse(payload)
       state.poll.push({_id: data.data.id, title: data.data.title, options: data.data.options, radioGroup: null});
+      state.snackBar.message='poll added';
+      state.snackBar.snack=true;
     },
     LIST_POLLS: (state, payload)=>{
-      state.poll= payload.data.data.slice(state.start, state.end);
+      state.poll= payload.data.data.slice(state.pollPage.start, state.pollPage.end);
+      state.pollPage.totalPage= Math.ceil(payload.data.data.length/12);
     },
     VOTE:(state, payload)=>{
       let resp =JSON.parse(payload);
@@ -78,18 +95,24 @@ export default new Vuex.Store({
       let resp = JSON.parse(payload)
       if(resp.resp.error===0){
         state.poll[resp.index].title=resp.title
+        state.snackBar.message='title changed';
+        state.snackBar.snack=true;
       }
     },
     DELETE_OPTION: (state, payload)=>{
       let resp = JSON.parse(payload);
       if(resp.resp.error===0){
         state.poll[resp.pollIndex].options= resp.options;
+        state.snackBar.message='option deleted';
+        state.snackBar.snack=true;
       }
     },
     ADD_NEW_OPTIONS_TO_POLL: (state, payload)=>{
       let resp = JSON.parse(payload);
       if(resp.resp.error===0){
         state.poll[resp.index].options=resp.options
+        state.snackBar.message='option added';
+        state.snackBar.snack=true;
       }
     },
     DELETE_POLL: (state, payload)=>{
@@ -115,12 +138,19 @@ export default new Vuex.Store({
       state.snackBar.snackBar=true;
     },
     PAGINATION: (state, payload)=>{
-      state.start=payload.start;
-      state.end=payload.end;
+      if(payload.name==='userList'){
+        state.usersPage.start=payload.start;
+        state.usersPage.end=payload.end;
+      }
+      else{
+        state.pollPage.start=payload.start;
+        state.pollPage.end=payload.end;
+      }
     },
     LIST_USERS: (state, payload)=>{
       let resp = JSON.parse(payload);
-      state.users = resp.data
+      state.users = resp.data.slice(state.usersPage.start, state.usersPage.end)
+      state.usersPage.totalPage = Math.ceil(resp.data.length/72);
     }
   },
   actions: {

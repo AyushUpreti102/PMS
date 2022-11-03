@@ -14,10 +14,10 @@
                         <v-card-subtitle class="v-card items">
                             <v-list>
                                 <v-list-item>
-                                    <v-list-item-title class="userInfo role">{{ 'Role : ' + role }}</v-list-item-title>
+                                    <v-list-item-title class="userInfo userNAme">{{ 'Username : ' + userName }}</v-list-item-title>
                                 </v-list-item>
                                 <v-list-item>
-                                    <v-list-item-title class="userInfo userNAme">{{ 'UserName : ' + userName }}
+                                    <v-list-item-title class="userInfo role">{{ 'Role : ' + role }}
                                     </v-list-item-title>
                                 </v-list-item>
                             </v-list>
@@ -29,7 +29,7 @@
         <v-main>
             <navBar>
                 <template v-slot:Logout>
-                    <ToolTip />
+                    <ToolTip :items="itemsList"/>
                 </template>
             </navBar>
         </v-main>
@@ -51,6 +51,22 @@ export default {
         userName() {
             let userName = localStorage.getItem("userName");
             return userName;
+        },
+        itemsList(){
+            let show = JSON.parse(localStorage.getItem('show'));
+            if (show) {
+                return  [
+                    { title: 'Profile' },
+                    { title: 'List Of Users' },
+                    { title: 'Logout' },
+                ]
+            }
+            else{
+                return [
+                    { title: 'Profile' },
+                    { title: 'Logout' },
+                ]
+            }
         }
     },
 }

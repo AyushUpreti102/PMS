@@ -19,7 +19,7 @@ router.beforeEach((to, from, next)=>{
     if (from.path==='/dashBoard') {
       next('/')
     }
-    if(from.path==='/'){
+    if(from.path==='/' || from.path==='/Profile' || from.path==='/List'){
       next('/dashBoard')
     }
   }

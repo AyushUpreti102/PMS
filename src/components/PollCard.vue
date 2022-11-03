@@ -1,5 +1,6 @@
 <template>
     <v-container>
+        <a href="#"></a>
         <v-layout row wrap>
             <v-flex v-for="(value, index) in poll" :key="index" xs12 sm6 md4 lg3 style="padding: 10px; min-width: 200px;">
                 <v-card elevation="0" class="mx-auto">
@@ -11,7 +12,7 @@
                             </v-radio>
                         </v-radio-group>
                         <v-card-actions>
-                            <PollDetails :btn="btn" :options="value.options" :pollTitle="value.title" :id="value._id" :idx="index"></PollDetails>
+                            <DialogBox :btn="btn" :options="value.options" :pollTitle="value.title" :id="value._id" :idx="index"/>
                             <v-spacer></v-spacer>
                             <v-btn text @click="deletePoll(value._id, index)" v-if="show">delete</v-btn>
                         </v-card-actions>
@@ -20,18 +21,17 @@
             </v-flex>
         </v-layout>
         <div class="text-center">
-            <v-pagination v-model="page" :length="12" style="margin-top: 10px;" @input="next"></v-pagination>
+            <a href="#" style="text-decoration: none;"><v-pagination v-model="page" :length="totalPageInPoll" :total-visible="7" style="margin-top: 10px;" @input="next"></v-pagination></a>
         </div>
     </v-container>
 </template>
 <script>
-import PollDetails from './PollDetails.vue';
+import DialogBox from './DialogBox.vue'
 export default {
     name: "PollCard",
     data() {
         return {
             page: 1,
-            totalPage: 12,
             itemsPerPage: 12,
             btn: 'Edit'
         };
@@ -47,6 +47,9 @@ export default {
         snackBar() {
             return this.$store.getters.snackBar;
         },
+        totalPageInPoll(){
+            return this.$store.getters.totalPageInPoll;
+        }
     },
     methods: {
         vote(id, radioGroup) {
@@ -58,12 +61,12 @@ export default {
         next() {
             let page = (this.page - 1) * this.itemsPerPage;
             let items = (this.page - 1) * this.itemsPerPage + this.itemsPerPage;
-            this.$store.dispatch("pagination", { start: page, end: items });
+            this.$store.dispatch("pagination", { start: page, end: items, name: 'pollList' });
             this.$emit("changePage");
         },
 
     },
-    components: { PollDetails }
+    components: { DialogBox }
 }
 </script>
 <style scoped>

@@ -35,7 +35,7 @@ export default {
     name: "SignUp",
     data() {
         return {
-            items: ['Admin', 'guest'],
+            items: ['admin', 'guest'],
             signUpDetails: { userName: '', role: '', password: null }
         }
     },

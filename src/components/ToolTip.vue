@@ -21,14 +21,10 @@ import UserProfile from './UserProfile.vue';
 import ListOfUsers from './ListOfUsers.vue';
 export default {
     name: 'ToolTip',
+    props: ['items'],
     data() {
         return {
             show: false,
-            items: [
-                { title: 'Profile' },
-                { title: 'List Of Users', show: localStorage.getItem('show') },
-                { title: 'Logout' },
-            ],
         }
     },
     methods: {

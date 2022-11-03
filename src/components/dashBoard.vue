@@ -4,10 +4,10 @@
         <v-main>
             <navBar>
                 <template v-slot:Logout>
-                    <ToolTip />
+                    <ToolTip :items="itemsList"/>
                 </template>
             </navBar>
-            <PollDetails :btn="btn" :condition="true"></PollDetails>
+            <DialogBox :btn="btn" :condition="true"/>
             <PollCard @changePage="change"/>
         </v-main>
     </v-container>
@@ -15,7 +15,7 @@
 <script>
 import PollCard from './PollCard.vue';
 import navBar from './navBar.vue';
-import PollDetails from './PollDetails.vue';
+import DialogBox from './DialogBox.vue'
 import ToolTip from './ToolTip.vue';
 
 export default {
@@ -27,6 +27,22 @@ export default {
         show(){
             let show = localStorage.getItem('show')
             return JSON.parse(show);
+        },
+        itemsList(){
+            let show = JSON.parse(localStorage.getItem('show'));
+            if (show) {
+                return  [
+                    { title: 'Profile' },
+                    { title: 'List Of Users' },
+                    { title: 'Logout' },
+                ]
+            }
+            else{
+                return [
+                    { title: 'Profile' },
+                    { title: 'Logout' },
+                ]
+            }
         }
     },
     mounted() {
@@ -43,6 +59,6 @@ export default {
             this.$store.dispatch('listPolls')
         },
     },
-    components: { PollCard, navBar, PollDetails, ToolTip }
+    components: { PollCard, navBar, DialogBox, ToolTip }
 }
 </script>

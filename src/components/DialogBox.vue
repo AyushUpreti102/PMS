@@ -49,7 +49,7 @@
 </template>
 <script>
 export default {
-    name: 'PollDetails',
+    name: 'DialogBox',
     props: ['btn', 'options', 'pollTitle', 'id', 'idx', 'condition'],
     data() {
         return {
@@ -123,14 +123,11 @@ export default {
                 if (this.title !== this.pollTitle) {
                     this.$store.dispatch('changeTitle', { pollId: this.id, pollTitle: this.title, index: this.idx });
                 }
-                else if (this.pollOptions.length === this.options.length - 1) {
+                if (this.pollOptions.length === this.options.length - 1) {
                     this.$store.dispatch('deletePollOptions', { pollId: this.id, options: this.pollOptions, index: this.idx, option: this.delOption })
                 }
-                else if (this.pollOptions.length === this.options.length + 1) {
+                if (this.pollOptions.length === this.options.length + 1) {
                     this.$store.dispatch('addNewOptionsToPoll', { id: this.id, index: this.idx, option: this.pollOptions[this.pollOptions.length - 1].option, options: this.pollOptions });
-                }
-                else {
-                    this.dialog = false;
                 }
                 this.dialog = false;
             }
