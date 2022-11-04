@@ -21,7 +21,18 @@ export default new Vuex.Store({
       start: 0,
       end: 72,
       totalPage: 0
-    }
+    },
+    boilerplate: {
+      pollPage: true,
+      userPage: true,
+    },
+    items:[
+      { title: 'DashBoard', access: 'ifLogged', icon: 'mdi-tablet-dashboard' },
+      { title: 'Profile', access: 'both', icon: 'mdi-account' },
+      { title: 'List Of Users', access: 'admin', icon: 'mdi-account-group' },
+      { title: 'Logout', access: 'both', icon: 'mdi-logout' },
+    ],
+    showBtnsInNavBar: true,
   },
   getters: {
     poll: (state)=>{
@@ -38,6 +49,15 @@ export default new Vuex.Store({
     },
     totalPageInUser: (state)=>{
       return state.usersPage.totalPage
+    },
+    boilerplate: (state)=>{
+      return state.boilerplate;
+    },
+    items: (state)=>{
+      return state.items
+    },
+    showBtnsInNavBar: (state)=>{
+      return state.showBtnsInNavBar;
     }
   },
   mutations: {
@@ -85,6 +105,7 @@ export default new Vuex.Store({
     LIST_POLLS: (state, payload)=>{
       state.poll= payload.data.data.slice(state.pollPage.start, state.pollPage.end);
       state.pollPage.totalPage= Math.ceil(payload.data.data.length/12);
+      state.boilerplate.pollPage=false;
     },
     VOTE:(state, payload)=>{
       let resp =JSON.parse(payload);
@@ -135,7 +156,7 @@ export default new Vuex.Store({
     },
     VALIDATE(state, payload){
       state.snackBar.message=payload
-      state.snackBar.snackBar=true;
+      state.snackBar.snack=true;
     },
     PAGINATION: (state, payload)=>{
       if(payload.name==='userList'){
@@ -151,6 +172,24 @@ export default new Vuex.Store({
       let resp = JSON.parse(payload);
       state.users = resp.data.slice(state.usersPage.start, state.usersPage.end)
       state.usersPage.totalPage = Math.ceil(resp.data.length/72);
+      state.boilerplate.userPage=false;
+    },
+    ACCESS: (state, payload)=>{
+      state.items[2].access=payload
+    },
+    SHOW_BTNS_IN_NAVBAR: (state, payload)=>{
+      let logUser = JSON.parse(localStorage.getItem('logUser'))
+      if(logUser===true){
+        state.showBtnsInNavBar=false;
+        state.items[0].access='ifLogged'
+      }
+      else{
+        state.showBtnsInNavBar=true;
+        state.items[0].access='notLogged'
+      }
+      if(payload==='dashBoard'){
+        state.items[0].access='notLogged'
+      }
     }
   },
   actions: {
@@ -221,6 +260,12 @@ export default new Vuex.Store({
       axios.get('https://secure-refuge-14993.herokuapp.com/list_users').then((resp)=>{
         context.commit('LIST_USERS', JSON.stringify(resp.data));
       })
+    },
+    access: (context, payload)=>{
+      context.commit('ACCESS', payload)
+    },
+    showBtnsInNavBar: (context, payload)=>{
+      context.commit('SHOW_BTNS_IN_NAVBAR', payload)
     }
   },
   modules: {

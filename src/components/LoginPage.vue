@@ -1,25 +1,15 @@
 <template>
     <v-container>
-        <v-main>
-            <NavBar>
-                <template v-slot:Login>
-                    <v-btn left text>Login</v-btn>
-                </template>
-                <template v-slot:SignUp>
-                    <v-btn right text>SignUp</v-btn>
-                </template>
-            </NavBar>
-        </v-main>
-        <v-snackbar v-model="snackBar.snack" timeout="2000" color="success" top>{{snackBar.message}}</v-snackbar>
         <v-layout>
             <v-flex>
                 <v-card elevation="0" width="60%" class="mx-auto">
                     <v-card-title>Login</v-card-title>
                     <v-card-subtitle>
                         <v-form>
-                            <v-text-field label="Username" required v-model="loginDetails.userName"></v-text-field>
-                            <v-text-field label="Password" type="password" required v-model="loginDetails.password"></v-text-field>
-                            <v-btn depressed color="primary" @click="login">Login</v-btn>
+                            <v-text-field label="Username" required v-model="loginDetails.userName" @keyup.enter="login"></v-text-field>
+                            <v-text-field label="Password" type="password" required v-model="loginDetails.password" @keyup.enter="login">
+                            </v-text-field>
+                            <v-btn depressed color="primary" @click="login">Login <v-icon>mdi-login-variant</v-icon></v-btn>
                         </v-form>
                     </v-card-subtitle>
                 </v-card>
@@ -29,29 +19,30 @@
 </template>
 <script>
 import dashBoard from './dashBoard.vue';
-import NavBar from './navBar.vue';
 
 export default {
     name: "LoginPage",
     data() {
         return {
-            loginDetails: { userName: '', password: null }
+            loginDetails: { userName: '', password: '' }
         }
     },
-    computed: {
-        snackBar() {
-            return this.$store.getters.snackBar;
-        },
-        message() {
-            return this.$store.getters.message;
-        },
+    mounted(){
+        this.$store.dispatch('showBtnsInNavBar');
     },
     methods: {
         login() {
-            this.$store.dispatch('login', { loginDetails: this.loginDetails, router: this.$router, component: dashBoard });
+            if(this.loginDetails.userName!=='' && this.loginDetails.password!==''){
+                this.$store.dispatch('login', { loginDetails: this.loginDetails, router: this.$router, component: dashBoard });
+            }
+            else {
+                this.$store.dispatch('validate', 'enter user name and password')
+            }
         },
+        trigger() {
+            this.$refs.sendReply.click();
+        }
     },
-    components: { NavBar }
 }
 </script>
 <style scoped>

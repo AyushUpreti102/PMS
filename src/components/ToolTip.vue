@@ -7,8 +7,14 @@
                 </v-btn>
             </template>
             <v-list width="200">
-                <v-list-item v-for="(item, index) in items" :key="index">
-                    <v-list-item-title @click="task(item.title)" style="cursor: pointer;">{{ item.title }}
+                <v-list-item v-for="(item, index) in items" :key="index" :class="{'display': item.access==='guest' || item.access==='notLogged'}">
+                    <v-list-item-title @click="task(item.title)" style="cursor: pointer;"
+                        v-if="item.access==='admin' || item.access==='both' || item.access==='ifLogged'">
+                        <div class="d-flex">
+                            <p>{{ item.title }}</p>
+                            <v-spacer></v-spacer>
+                            <v-icon style="margin-bottom: 15px;">{{item.icon}}</v-icon>
+                        </div>
                     </v-list-item-title>
                 </v-list-item>
             </v-list>
@@ -19,12 +25,17 @@
 import Login from './LoginPage.vue';
 import UserProfile from './UserProfile.vue';
 import ListOfUsers from './ListOfUsers.vue';
+import dashBoard from './dashBoard.vue'
 export default {
     name: 'ToolTip',
-    props: ['items'],
     data() {
         return {
             show: false,
+        }
+    },
+    computed: {
+        items(){
+            return this.$store.getters.items;
         }
     },
     methods: {
@@ -35,10 +46,18 @@ export default {
             else if (val === 'Profile') {
                 this.$router.push({ path: '/Profile', component: UserProfile })
             }
+            else if(val==='DashBoard'){
+                this.$router.push({ path: '/dashBoard', component: dashBoard })
+            }
             else {
                 this.$router.push({ path: '/List', component: ListOfUsers })
             }
-        }
+        },
     }
 }
 </script>
+<style scoped>
+.display {
+    display: none;
+}
+</style>

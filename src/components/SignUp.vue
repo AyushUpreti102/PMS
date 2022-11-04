@@ -1,26 +1,16 @@
 <template>
     <v-container>
-        <v-main>
-            <NavBar>
-                <template v-slot:Login>
-                    <v-btn left text>Login</v-btn>
-                </template>
-                <template v-slot:SignUp>
-                    <v-btn right text>SignUp</v-btn>
-                </template>
-            </NavBar>
-        </v-main>
-        <v-snackbar v-model="snackBar.snack" timeout="2000" color="success" top>{{snackBar.message}}</v-snackbar>
         <v-layout>
             <v-flex>
                 <v-card elevation="0" width="60%" class="mx-auto">
                     <v-card-title>Signup</v-card-title>
                     <v-card-text>
                         <v-form>
-                            <v-text-field label="Username" required v-model="signUpDetails.userName"></v-text-field>
-                            <v-select :items="items" label="Role" outlined v-model="signUpDetails.role"></v-select>
-                            <v-text-field label="Password" type="password" required v-model="signUpDetails.password"></v-text-field>
-                            <v-btn depressed color="primary" @click="addUser">Signup</v-btn>
+                            <v-text-field @keyup.enter="addUser" label="Username" required v-model="signUpDetails.userName"></v-text-field>
+                            <v-select @keyup.enter="addUser" :items="items" label="Role" outlined v-model="signUpDetails.role"></v-select>
+                            <v-text-field @keyup.enter="addUser" label="Password" type="password" required v-model="signUpDetails.password">
+                            </v-text-field>
+                            <v-btn depressed color="primary" @click="addUser">Signup <v-icon>mdi-arrow-right-drop-circle</v-icon></v-btn>
                         </v-form>
                     </v-card-text>
                 </v-card>
@@ -29,30 +19,28 @@
     </v-container>
 </template>
 <script>
-import NavBar from './navBar.vue';
 import LoginPage from './LoginPage.vue';
 export default {
     name: "SignUp",
     data() {
         return {
             items: ['admin', 'guest'],
-            signUpDetails: { userName: '', role: '', password: null }
+            signUpDetails: { userName: '', role: '', password: '' }
         }
     },
-    computed: {
-        snackBar() {
-            return this.$store.getters.snackBar;
-        },
-        message() {
-            return this.$store.getters.message;
-        }
+    mounted(){
+        this.$store.dispatch('showBtnsInNavBar');
     },
     methods: {
         addUser() {
-            this.$store.dispatch('addUser', { details: JSON.stringify(this.signUpDetails), router: this.$router, component: LoginPage });
+            if (this.signUpDetails.userName !== '' && this.signUpDetails.password !== '' && this.signUpDetails.role!=='') {
+                this.$store.dispatch('addUser', { details: JSON.stringify(this.signUpDetails), router: this.$router, component: LoginPage });
+            }
+            else {
+                this.$store.dispatch('validate', 'enter below details')
+            }
         }
     },
-    components: { NavBar }
 }
 </script>
 <style scoped>

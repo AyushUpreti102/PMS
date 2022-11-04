@@ -1,52 +1,31 @@
 <template>
     <v-container>
-        <v-snackbar v-model="snackBar.snack" timeout="2000" color="success" top>{{snackBar.message}}</v-snackbar>
+        <v-skeleton-loader type="card" v-if="boilerplate"></v-skeleton-loader>
         <v-main>
-            <navBar>
-                <template v-slot:Logout>
-                    <ToolTip :items="itemsList"/>
-                </template>
-            </navBar>
-            <DialogBox :btn="btn" :condition="true"/>
+            <DialogBox :btn="btn" :addClass="true"/>
             <PollCard @changePage="change"/>
         </v-main>
     </v-container>
 </template>
 <script>
 import PollCard from './PollCard.vue';
-import navBar from './navBar.vue';
 import DialogBox from './DialogBox.vue'
-import ToolTip from './ToolTip.vue';
 
 export default {
     name: "dashBoard",
     computed: {
-        snackBar() {
-            return this.$store.getters.snackBar;
-        },
         show(){
             let show = localStorage.getItem('show')
             return JSON.parse(show);
         },
-        itemsList(){
-            let show = JSON.parse(localStorage.getItem('show'));
-            if (show) {
-                return  [
-                    { title: 'Profile' },
-                    { title: 'List Of Users' },
-                    { title: 'Logout' },
-                ]
-            }
-            else{
-                return [
-                    { title: 'Profile' },
-                    { title: 'Logout' },
-                ]
-            }
-        }
+        boilerplate() {
+            return this.$store.getters.boilerplate.pollPage;
+        },
     },
     mounted() {
         this.$store.dispatch('listPolls');
+        this.$store.dispatch('access', localStorage.getItem('user'));
+        this.$store.dispatch('showBtnsInNavBar', 'dashBoard');
     },
     data() {
         return {
@@ -59,6 +38,6 @@ export default {
             this.$store.dispatch('listPolls')
         },
     },
-    components: { PollCard, navBar, DialogBox, ToolTip }
+    components: { PollCard, DialogBox }
 }
 </script>

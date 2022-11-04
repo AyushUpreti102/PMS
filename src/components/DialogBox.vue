@@ -2,7 +2,7 @@
     <div class="text-center">
         <v-dialog v-model="dialog" width="500">
             <template v-slot:activator="{ on, attrs }">
-                <v-btn v-bind="attrs" v-on="on" depressed v-if="show" @click="edit" :class="{btnPosition: condition}">{{ btn }}</v-btn>
+                <v-btn v-bind="attrs" v-on="on" depressed v-if="show" @click="edit" :class="{btnPosition: addClass}">{{ btn }}</v-btn>
             </template>
 
             <v-card>
@@ -50,7 +50,7 @@
 <script>
 export default {
     name: 'DialogBox',
-    props: ['btn', 'options', 'pollTitle', 'id', 'idx', 'condition'],
+    props: ['btn', 'options', 'pollTitle', 'id', 'indx', 'addClass'],
     data() {
         return {
             dialog: false,

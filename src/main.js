@@ -15,6 +15,9 @@ router.beforeEach((to, from, next)=>{
   if (logUser!==true && (to.path==='/dashBoard' || to.path==='/Profile' || to.path==='/List')) {
     next('/')
   }
+  // else if(to.path!=='/Login' || to.path!=='/Signup' || to.path!=='/dashBoard' || to.path!=='/Profile' || to.path!=='/List' || to.path!=='/'){
+  //   next('/!');
+  // }
   else if (logUser===true && (to.path==='/Login' || to.path==='/Signup')) {
     if (from.path==='/dashBoard') {
       next('/')

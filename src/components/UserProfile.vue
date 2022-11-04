@@ -26,23 +26,11 @@
                 </v-card>
             </v-card-subtitle>
         </v-card>
-        <v-main>
-            <navBar>
-                <template v-slot:Logout>
-                    <ToolTip :items="itemsList"/>
-                </template>
-            </navBar>
-        </v-main>
     </v-container>
 </template>
 <script>
-import navBar from './navBar.vue';
 export default {
     name: "UserProfile",
-    components: {
-        navBar,
-        ToolTip: () => import('./ToolTip.vue'),
-    },
     computed: {
         role() {
             let role = localStorage.getItem("user");
@@ -68,6 +56,10 @@ export default {
                 ]
             }
         }
+    },
+    mounted() {
+        this.$store.dispatch('access', localStorage.getItem('user'));
+        this.$store.dispatch('showBtnsInNavBar');
     },
 }
 </script>
