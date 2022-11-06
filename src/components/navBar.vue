@@ -2,7 +2,7 @@
     <v-app-bar elevation="0" app>
         <v-app-bar-title>
             <router-link to="/" style="cursor: pointer; text-decoration: none; color: black;">
-                <h2 class="display-1">Lets Vote</h2>
+                <h2 class="display-1">Let's Vote</h2>
             </router-link>
         </v-app-bar-title>
         <v-spacer></v-spacer>

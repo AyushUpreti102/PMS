@@ -12,5 +12,5 @@ export default[
     {path: '/dashBoard', component: dashBoard},
     {path: '/Profile', component: UserProfile},
     {path: '/List', component: ListOfUsers},
-    {path: '/!', component: ErrorPage},
+    {path: '*', component: ErrorPage},
 ]

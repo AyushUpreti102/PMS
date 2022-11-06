@@ -10,7 +10,7 @@
         lg3
         style="padding: 10px; min-width: 200px"
       >
-        <v-card elevation="0" class="mx-auto">
+        <v-card elevation="4" class="mx-auto">
           <v-card-title>{{ value.title }}</v-card-title>
           <v-card-text>
             <v-radio-group v-model="value.radioGroup">
@@ -45,7 +45,7 @@
       <v-pagination
         v-model="page"
         :length="totalPageInPoll"
-        :total-visible="7"
+        :total-visible="6"
         style="margin-top: 10px"
         @input="next"
       >
@@ -81,7 +81,7 @@ export default {
   },
   methods: {
     vote(id, radioGroup) {
-      this.$store.dispatch("vote", { id: id, radioGroup: radioGroup });
+      this.$store.dispatch("vote", { id: id, option: radioGroup });
     },
     deletePoll(id, i) {
       this.$store.dispatch("deletePoll", { id: id, idx: i });
@@ -95,13 +95,15 @@ export default {
         name: "pollList",
       });
       this.$emit("changePage");
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      })
     },
   },
   components: { DialogBox },
 };
 </script>
 <style scoped>
-.mx-auto {
-  border: 1px solid lightgray;
-}
+
 </style>

@@ -12,9 +12,6 @@ export default {
         snackBar() {
             return this.$store.getters.snackBar;
         },
-        message() {
-            return this.$store.getters.message;
-        }
     },
     mounted(){
         this.$store.dispatch('showBtnsInNavBar');

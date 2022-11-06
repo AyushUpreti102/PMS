@@ -1,9 +1,9 @@
 <template>
     <v-container>
-        <v-skeleton-loader type="card" v-if="boilerplate"></v-skeleton-loader>
-        <v-main>
-            <DialogBox :btn="btn" :addClass="true"/>
-            <PollCard @changePage="change"/>
+        <v-main style="padding: 0;">
+            <DialogBox :btn="btn" v-if="!boilerplate"/>
+            <v-skeleton-loader type="card" v-if="boilerplate"></v-skeleton-loader>
+            <PollCard @changePage="change" v-if="!boilerplate"/>
         </v-main>
     </v-container>
 </template>
@@ -13,6 +13,7 @@ import DialogBox from './DialogBox.vue'
 
 export default {
     name: "dashBoard",
+    components: { PollCard, DialogBox },
     computed: {
         show(){
             let show = localStorage.getItem('show')
@@ -24,7 +25,7 @@ export default {
     },
     mounted() {
         this.$store.dispatch('listPolls');
-        this.$store.dispatch('access', localStorage.getItem('user'));
+        this.$store.dispatch('access', localStorage.getItem('token'));
         this.$store.dispatch('showBtnsInNavBar', 'dashBoard');
     },
     data() {
@@ -36,8 +37,7 @@ export default {
     methods: {
         change(){
             this.$store.dispatch('listPolls')
-        },
-    },
-    components: { PollCard, DialogBox }
+        }
+    }
 }
 </script>

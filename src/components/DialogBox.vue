@@ -1,8 +1,8 @@
 <template>
-    <div class="text-center">
+    <div class="text-right">
         <v-dialog v-model="dialog" width="500">
             <template v-slot:activator="{ on, attrs }">
-                <v-btn v-bind="attrs" v-on="on" depressed v-if="show" @click="edit" :class="{btnPosition: addClass}">{{ btn }}</v-btn>
+                <v-btn v-bind="attrs" v-on="on" depressed @click="edit" v-if="show">{{ btn }}</v-btn>
             </template>
 
             <v-card>
@@ -62,10 +62,10 @@ export default {
         };
     },
     computed: {
-        show() {
-            let show = localStorage.getItem("show");
+        show(){
+            let show = localStorage.getItem('show')
             return JSON.parse(show);
-        },
+        }
     },
     methods: {
         edit() {
@@ -80,8 +80,11 @@ export default {
                 this.option = ''
             }
             if (this.btn === 'Edit') {
-                if (this.pollOptions.length === this.options.length + 1) {
-                    alert('one option can be added at a time');
+                if(this.pollOptions[this.options.length-1]!==this.options[this.options.length-1]){
+                    this.$store.dispatch('validate', 'you can either delete or add a option at a time');
+                }
+                else if (this.pollOptions.length === this.options.length + 1) {
+                    this.$store.dispatch('validate', 'one option can be added at a time');
                 }
                 else {
                     this.pollOptions.push({ option: JSON.parse(JSON.stringify(this.option)), vote: 0 });
@@ -94,25 +97,28 @@ export default {
                 this.pollOptions.splice(i, 1);
             }
             if (this.btn === 'Edit') {
-                if (this.pollOptions.length === this.options.length) {
+                if(this.pollOptions.length < 3){
+                    this.$store.dispatch('validate', '2 options are mandatory else delete the poll');
+                }
+                else if (this.pollOptions.length === this.options.length) {
                     this.pollOptions.splice(i, 1);
                     this.delOption = val
                 }
                 else {
-                    alert('on option can be deleted at a time');
+                    this.$store.dispatch('validate', 'on option can be deleted at a time');
                 }
             }
         },
         task() {
             if (this.btn === 'Add_Poll') {
                 if (this.title !== '') {
-                    if (this.pollOptions.length !== 0) {
+                    if (this.pollOptions.length > 1) {
                         this.dialog = false
                         this.$store.dispatch('addPoll', JSON.stringify({ title: this.title, options: this.pollOptions }));
                         this.pollOptions.splice(0, this.pollOptions.length);
                         this.title = ''
                     } else {
-                        this.$store.dispatch('validate', 'add options to the poll');
+                        this.$store.dispatch('validate', '2 options are mandatory in poll');
                     }
                 }
                 else {
@@ -121,13 +127,16 @@ export default {
             }
             else {
                 if (this.title !== this.pollTitle) {
-                    this.$store.dispatch('changeTitle', { pollId: this.id, pollTitle: this.title, index: this.idx });
+                    this.$store.dispatch('changeTitle', { pollId: this.id, pollTitle: this.title, index: this.indx });
                 }
                 if (this.pollOptions.length === this.options.length - 1) {
-                    this.$store.dispatch('deletePollOptions', { pollId: this.id, options: this.pollOptions, index: this.idx, option: this.delOption })
+                    this.$store.dispatch('deletePollOptions', { pollId: this.id, options: this.pollOptions, index: this.indx, option: this.delOption })
                 }
                 if (this.pollOptions.length === this.options.length + 1) {
-                    this.$store.dispatch('addNewOptionsToPoll', { id: this.id, index: this.idx, option: this.pollOptions[this.pollOptions.length - 1].option, options: this.pollOptions });
+                    this.$store.dispatch('addNewOptionsToPoll', { id: this.id, index: this.indx, option: this.pollOptions[this.pollOptions.length - 1].option, options: this.pollOptions });
+                }
+                if(this.pollOptions[this.options.length-1]===this.pollOptions[this.options.length-1]){
+                    //
                 }
                 this.dialog = false;
             }
@@ -145,10 +154,3 @@ export default {
     },
 }
 </script>
-<style scoped>
-.btnPosition {
-    position: relative;
-    left: 40vw;
-    bottom: 8vh;
-}
-</style>

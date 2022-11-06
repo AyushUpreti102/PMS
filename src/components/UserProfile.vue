@@ -1,23 +1,23 @@
 <template>
     <v-container>
-        <v-card elevation="0">
+        <v-card elevation="0" class="profileCard">
             <v-card-title>
-                <h1>Profile</h1>
+                <h1 style="color: white;">Profile</h1>
             </v-card-title>
             <v-spacer></v-spacer>
             <v-card-subtitle>
-                <v-card elevation="0" class="profileCard">
+                <v-card elevation="0" style="background-color: transparent;">
                     <div class="d-flex">
                         <v-card-title>
-                            <v-icon size="200">mdi-account-circle</v-icon>
+                            <v-icon size="200" color="blue darken-4">mdi-account-circle</v-icon>
                         </v-card-title>
                         <v-card-subtitle class="v-card items">
-                            <v-list>
+                            <v-list style="background-color: transparent;">
                                 <v-list-item>
-                                    <v-list-item-title class="userInfo userNAme">{{ 'Username : ' + userName }}</v-list-item-title>
+                                    <v-list-item-title class="userInfo userNAme">{{ 'Username : ' + token.username }}</v-list-item-title>
                                 </v-list-item>
                                 <v-list-item>
-                                    <v-list-item-title class="userInfo role">{{ 'Role : ' + role }}
+                                    <v-list-item-title class="userInfo role">{{ 'Role : ' + token.role }}
                                     </v-list-item-title>
                                 </v-list-item>
                             </v-list>
@@ -32,34 +32,14 @@
 export default {
     name: "UserProfile",
     computed: {
-        role() {
-            let role = localStorage.getItem("user");
-            return role;
-        },
-        userName() {
-            let userName = localStorage.getItem("userName");
-            return userName;
-        },
-        itemsList(){
-            let show = JSON.parse(localStorage.getItem('show'));
-            if (show) {
-                return  [
-                    { title: 'Profile' },
-                    { title: 'List Of Users' },
-                    { title: 'Logout' },
-                ]
-            }
-            else{
-                return [
-                    { title: 'Profile' },
-                    { title: 'Logout' },
-                ]
-            }
+        token(){
+            let token = localStorage.getItem('token');
+            return JSON.parse(token)
         }
     },
     mounted() {
-        this.$store.dispatch('access', localStorage.getItem('user'));
-        this.$store.dispatch('showBtnsInNavBar');
+        this.$store.dispatch('access', localStorage.getItem('token'));
+        this.$store.dispatch('showBtnsInNavBar', 'dashBoard');
     },
 }
 </script>
@@ -68,6 +48,7 @@ export default {
     font-size: 30px;
     font-family: sans-serif;
     font-weight: bold;
+    color: white;
 }
 
 .userNAme {
@@ -81,7 +62,7 @@ export default {
 }
 
 .profileCard {
-    border: 5px solid lightgrey;
+    background-image: linear-gradient(to left, #8360c3, #2ebf91);
 }
 
 @media only screen and (max-width: 650px) {
@@ -91,6 +72,12 @@ export default {
 
     .profileCard {
         height: 500px;
+    }
+    .userInfo {
+        font-size: 25px;
+        font-family: sans-serif;
+        font-weight: bold;
+        color: white;
     }
 }
 </style>

@@ -1,9 +1,9 @@
 <template>
-  <v-app>
+  <v-app style="background-image: linear-gradient(120deg, #d4fc79 0%, #96e6a1 100%);">
+    <v-snackbar v-model="snackBar.snack" timeout="2000" :color="snackBar.color" top>{{ snackBar.message }}</v-snackbar>
     <v-main>
-      <router-view></router-view>
-      <v-snackbar v-model="snackBar.snack" timeout="2000" color="success" top>{{ snackBar.message }}</v-snackbar>
       <navBar/>
+      <router-view></router-view>
     </v-main>
   </v-app>
 </template>
@@ -16,9 +16,6 @@ export default {
   computed: {
     snackBar() {
       return this.$store.getters.snackBar;
-    },
-    message() {
-      return this.$store.getters.message;
     },
   }
 };

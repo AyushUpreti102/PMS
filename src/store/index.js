@@ -9,6 +9,7 @@ export default new Vuex.Store({
     snackBar:{
       snack: false,
       message: '', 
+      color: ''
     } , 
     poll: [],
     users: [],
@@ -65,11 +66,10 @@ export default new Vuex.Store({
       let resp = payload;
       if(resp.resp.error===0){
         let decode = VueJwtDecode.decode(resp.resp.token);
-        localStorage.setItem('user', decode.role);
-        localStorage.setItem('userName', decode.username);
+        localStorage.setItem('token', JSON.stringify(decode));
         localStorage.setItem('logUser', true)
-        let role = localStorage.getItem('user');
-        if(role==='admin'){
+        let token = JSON.parse(localStorage.getItem('token'))
+        if(token.role==='admin'){
           localStorage.setItem('show', true)
         }
         else{
@@ -77,10 +77,12 @@ export default new Vuex.Store({
         }
         resp.router.push({path: '/dashBoard', component: payload.component});
         state.snackBar.message='login successfully';
+        state.snackBar.color='success'
         state.snackBar.snack=true;
       }
       else{
         state.snackBar.message = 'password or email do not match enter again';
+        state.snackBar.color='error'
         state.snackBar.snack=true;
       }
     },
@@ -89,18 +91,28 @@ export default new Vuex.Store({
       if(resp.resp.error===0){
         resp.router.push({path: '/Login', component: payload.component})
         state.snackBar.message='Signup completed please login to continue'
+        state.snackBar.color='success'
         state.snackBar.snack=true;
       }
       else{
         state.snackBar.message=payload.data.message;
+        state.snackBar.color='error'
         state.snackBar.snack=true;
       }
     },
     ADD_POLL: (state, payload)=>{
       let data = JSON.parse(payload)
-      state.poll.push({_id: data.data.id, title: data.data.title, options: data.data.options, radioGroup: null});
-      state.snackBar.message='poll added';
-      state.snackBar.snack=true;
+      if(data.error===0){
+        state.poll.push({_id: data.data.id, title: data.data.title, options: data.data.options, radioGroup: null});
+        state.snackBar.message='poll added';
+        state.snackBar.color='success'
+        state.snackBar.snack=true;
+      }
+      else{
+        state.snackBar.color='error'
+        state.snackBar.message='! failed to add new poll';
+        state.snackBar.snack=true;
+      }
     },
     LIST_POLLS: (state, payload)=>{
       state.poll= payload.data.data.slice(state.pollPage.start, state.pollPage.end);
@@ -109,6 +121,7 @@ export default new Vuex.Store({
     },
     VOTE:(state, payload)=>{
       let resp =JSON.parse(payload);
+      console.log(resp);
       state;
       resp;
     },
@@ -117,6 +130,12 @@ export default new Vuex.Store({
       if(resp.resp.error===0){
         state.poll[resp.index].title=resp.title
         state.snackBar.message='title changed';
+        state.snackBar.color='success'
+        state.snackBar.snack=true;
+      }
+      else{
+        state.snackBar.color='error'
+        state.snackBar.message='! failed to change title';
         state.snackBar.snack=true;
       }
     },
@@ -125,6 +144,12 @@ export default new Vuex.Store({
       if(resp.resp.error===0){
         state.poll[resp.pollIndex].options= resp.options;
         state.snackBar.message='option deleted';
+        state.snackBar.color='success'
+        state.snackBar.snack=true;
+      }
+      else{
+        state.snackBar.color='error'
+        state.snackBar.message='! failed to delete option';
         state.snackBar.snack=true;
       }
     },
@@ -133,6 +158,12 @@ export default new Vuex.Store({
       if(resp.resp.error===0){
         state.poll[resp.index].options=resp.options
         state.snackBar.message='option added';
+        state.snackBar.color='success'
+        state.snackBar.snack=true;
+      }
+      else{
+        state.snackBar.color='error'
+        state.snackBar.message='! failed to add option';
         state.snackBar.snack=true;
       }
     },
@@ -141,6 +172,7 @@ export default new Vuex.Store({
       if (resp.error===0) {
         state.poll.splice(resp.index, 1);
         state.snackBar.message='Poll deleted successfully'
+        state.snackBar.color='success'
         state.snackBar.snack=true;
       } else {
         state.snackBar.snack=true;
@@ -150,16 +182,22 @@ export default new Vuex.Store({
     LOGOUT: (state, payload)=>{
       let resp = payload
       state.snackBar.message='logged out successfully';
+      state.snackBar.color='success'
       state.snackBar.snack=true;
       localStorage.clear();
       resp.router.push({path: '/Login', component: payload.component});
     },
     VALIDATE(state, payload){
       state.snackBar.message=payload
+      state.snackBar.color='error'
       state.snackBar.snack=true;
     },
     PAGINATION: (state, payload)=>{
       if(payload.name==='userList'){
+        state.boilerplate.userPage=true
+        setTimeout(() => {
+          state.boilerplate.userPage=false;
+        }, 1500);
         state.usersPage.start=payload.start;
         state.usersPage.end=payload.end;
       }
@@ -175,19 +213,20 @@ export default new Vuex.Store({
       state.boilerplate.userPage=false;
     },
     ACCESS: (state, payload)=>{
-      state.items[2].access=payload
+      let res = JSON.parse(payload)
+      state.items[2].access=res.role
     },
     SHOW_BTNS_IN_NAVBAR: (state, payload)=>{
       let logUser = JSON.parse(localStorage.getItem('logUser'))
       if(logUser===true){
         state.showBtnsInNavBar=false;
         state.items[0].access='ifLogged'
+        if(payload==='dashBoard'){
+          state.items[0].access='notLogged'
+        }
       }
       else{
         state.showBtnsInNavBar=true;
-        state.items[0].access='notLogged'
-      }
-      if(payload==='dashBoard'){
         state.items[0].access='notLogged'
       }
     }
@@ -221,10 +260,9 @@ export default new Vuex.Store({
       })
     },
     vote: (context, payload)=>{
-      axios.get(`https://secure-refuge-14993.herokuapp.com/do_vote?id=${payload.id}&option_text=${payload.radioGroup}`).then((resp)=>{
+      axios.get(`https://secure-refuge-14993.herokuapp.com/do_vote?id=${payload.id}&option_text=${payload.option}`, {headers: JSON.parse(localStorage.getItem('token'))})
+      .then((resp)=>{
         context.commit('VOTE', JSON.stringify(resp));
-      }).catch((err)=>{
-        console.log(err);
       })
     },
     changeTitle: (context, payload)=>{
