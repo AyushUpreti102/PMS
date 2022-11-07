@@ -1,19 +1,36 @@
 import Vue from 'vue'
 import App from './App.vue'
 import vuetify from './plugins/vuetify'
-import store from './store'
 import VueRouter from 'vue-router'
-import LoginPage from './components/LoginPage.vue'
-import SignUp from './components/SignUp.vue'
-import HomePage from './components/HomePage.vue'
+import routes from './routes'
+import store from './store/index'
 Vue.use(VueRouter);
+const router = new VueRouter({
+  mode: 'history',
+  routes,
+})
 
-const routes = [
-    {path: '/', component: HomePage},
-    {path: '/Signup', component: SignUp},
-    {path: '/LoginPage', component: LoginPage}
-]
-const router = new VueRouter({routes});
+router.beforeEach((to, from, next)=>{
+  let logUser = JSON.parse(localStorage.getItem('logUser'));
+  let show = JSON.parse(localStorage.getItem('show'));
+  if (logUser!==true && (to.path==='/dashBoard' || to.path==='/Profile' || to.path==='/List')) {
+    next('/')
+  }
+  else if (logUser===true && (to.path==='/Login' || to.path==='/Signup')) {
+    if (from.path==='/dashBoard') {
+      next('/')
+    }
+    if(from.path==='/' || from.path==='/Profile' || from.path==='/List'){
+      next('/dashBoard')
+    }
+  }
+  else if(logUser===true && show!==true && to.path==='/List'){
+    next('/dashBoard')
+  }
+  else{
+    next();
+  }
+})
 
 Vue.config.productionTip = false
 
