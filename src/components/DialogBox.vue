@@ -2,7 +2,7 @@
     <div class="text-right">
         <v-dialog v-model="dialog" width="500">
             <template v-slot:activator="{ on, attrs }">
-                <v-btn v-bind="attrs" v-on="on" depressed @click="edit" v-if="show">{{ btn }}</v-btn>
+                <v-btn v-bind="attrs" v-on="on" depressed @click="edit" v-if="show">{{ btn+' ' }} <v-icon small>{{icon}}</v-icon></v-btn>
             </template>
 
             <v-card>
@@ -18,7 +18,7 @@
                         <div class="d-flex">
                             <v-text-field label="Poll Options" v-model="option"></v-text-field>
                             <v-btn depressed color="white" @click="addOptions" style="margin-top: 10px;">
-                                <v-icon>mdi-plus-box</v-icon>
+                                <v-icon color="green">mdi-plus-box</v-icon>
                             </v-btn>
                         </div>
                         <v-list-item>
@@ -28,7 +28,7 @@
                                     <div class="d-flex">
                                         <p>{{ '- ' + val.option }}</p>
                                         <v-spacer></v-spacer>
-                                        <v-icon style="cursor: pointer;" @click="deleteOption(i, val.option)">mdi-delete
+                                        <v-icon style="cursor: pointer;" @click="deleteOption(i, val.option)" color="red">mdi-delete
                                         </v-icon>
                                     </div>
                                 </v-list-item-subtitle>
@@ -50,7 +50,7 @@
 <script>
 export default {
     name: 'DialogBox',
-    props: ['btn', 'options', 'pollTitle', 'id', 'indx', 'addClass'],
+    props: ['btn', 'icon','options', 'pollTitle', 'id', 'indx', 'addClass'],
     data() {
         return {
             dialog: false,
@@ -80,16 +80,9 @@ export default {
                 this.option = ''
             }
             if (this.btn === 'Edit') {
-                if(this.pollOptions[this.options.length-1]!==this.options[this.options.length-1]){
-                    this.$store.dispatch('validate', 'you can either delete or add a option at a time');
-                }
-                else if (this.pollOptions.length === this.options.length + 1) {
-                    this.$store.dispatch('validate', 'one option can be added at a time');
-                }
-                else {
-                    this.pollOptions.push({ option: JSON.parse(JSON.stringify(this.option)), vote: 0 });
-                    this.option = ''
-                }
+                this.pollOptions.push({ option: JSON.parse(JSON.stringify(this.option)), vote: 0 });
+                this.option = ''
+                this.$store.dispatch('addNewOptionsToPoll', { id: this.id, index: this.indx, option: this.pollOptions[this.pollOptions.length - 1].option, options: this.pollOptions });
             }
         },
         deleteOption(i, val) {
@@ -100,12 +93,10 @@ export default {
                 if(this.pollOptions.length < 3){
                     this.$store.dispatch('validate', '2 options are mandatory else delete the poll');
                 }
-                else if (this.pollOptions.length === this.options.length) {
+                else {
                     this.pollOptions.splice(i, 1);
                     this.delOption = val
-                }
-                else {
-                    this.$store.dispatch('validate', 'on option can be deleted at a time');
+                    this.$store.dispatch('deletePollOptions', { pollId: this.id, options: this.pollOptions, index: this.indx, option: this.delOption })
                 }
             }
         },
@@ -128,15 +119,6 @@ export default {
             else {
                 if (this.title !== this.pollTitle) {
                     this.$store.dispatch('changeTitle', { pollId: this.id, pollTitle: this.title, index: this.indx });
-                }
-                if (this.pollOptions.length === this.options.length - 1) {
-                    this.$store.dispatch('deletePollOptions', { pollId: this.id, options: this.pollOptions, index: this.indx, option: this.delOption })
-                }
-                if (this.pollOptions.length === this.options.length + 1) {
-                    this.$store.dispatch('addNewOptionsToPoll', { id: this.id, index: this.indx, option: this.pollOptions[this.pollOptions.length - 1].option, options: this.pollOptions });
-                }
-                if(this.pollOptions[this.options.length-1]===this.pollOptions[this.options.length-1]){
-                    //
                 }
                 this.dialog = false;
             }

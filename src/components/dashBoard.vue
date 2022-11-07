@@ -1,7 +1,7 @@
 <template>
     <v-container>
         <v-main style="padding: 0;">
-            <DialogBox :btn="btn" v-if="!boilerplate"/>
+            <DialogBox :btn="btn" :icon="icon" v-if="!boilerplate"/>
             <v-skeleton-loader type="card" v-if="boilerplate"></v-skeleton-loader>
             <PollCard @changePage="change" v-if="!boilerplate"/>
         </v-main>
@@ -32,6 +32,7 @@ export default {
         return {
             dialog: false,
             btn: 'Add_Poll',
+            icon: 'mdi-plus-thick'
         };
     },
     methods: {

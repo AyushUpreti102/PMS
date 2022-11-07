@@ -27,6 +27,7 @@
             <v-card-actions>
               <DialogBox
                 :btn="btn"
+                :icon="icon"
                 :options="value.options"
                 :pollTitle="value.title"
                 :id="value._id"
@@ -34,7 +35,7 @@
               />
               <v-spacer></v-spacer>
               <v-btn text @click="deletePoll(value._id, index)" v-if="show"
-                >delete</v-btn
+                >delete <v-icon small>mdi-delete</v-icon></v-btn
               >
             </v-card-actions>
           </v-card-text>
@@ -62,6 +63,7 @@ export default {
       page: 1,
       itemsPerPage: 12,
       btn: "Edit",
+      icon: 'mdi-pencil'
     };
   },
   computed: {

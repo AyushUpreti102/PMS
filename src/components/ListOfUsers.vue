@@ -29,7 +29,7 @@ export default {
     },
     mounted() {
         this.$store.dispatch('listUsers')
-        this.$store.dispatch('showBtnsInNavBar', 'dashBoard');
+        this.$store.dispatch('showBtnsInNavBar');
     },
     computed: {
         users() {

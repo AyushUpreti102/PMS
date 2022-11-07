@@ -33,7 +33,11 @@ export default new Vuex.Store({
       { title: 'List Of Users', access: 'admin', icon: 'mdi-account-group' },
       { title: 'Logout', access: 'both', icon: 'mdi-logout' },
     ],
-    showBtnsInNavBar: true,
+    showBtnsInNavBar: {
+      login: true,
+      signup: true,
+      tooltip: false,
+    },
   },
   getters: {
     poll: (state)=>{
@@ -219,15 +223,27 @@ export default new Vuex.Store({
     SHOW_BTNS_IN_NAVBAR: (state, payload)=>{
       let logUser = JSON.parse(localStorage.getItem('logUser'))
       if(logUser===true){
-        state.showBtnsInNavBar=false;
+        state.showBtnsInNavBar.login=false;
+        state.showBtnsInNavBar.signup=false;
+        state.showBtnsInNavBar.tooltip=true
         state.items[0].access='ifLogged'
         if(payload==='dashBoard'){
           state.items[0].access='notLogged'
         }
       }
       else{
-        state.showBtnsInNavBar=true;
+        state.showBtnsInNavBar.tooltip=false
         state.items[0].access='notLogged'
+        if(payload==='login'){
+          state.showBtnsInNavBar.login=false
+        }
+        else if(payload==='signup'){
+          state.showBtnsInNavBar.signup=false;
+        }
+        else{
+          state.showBtnsInNavBar.login=true;
+          state.showBtnsInNavBar.signup=true;
+        }
       }
     }
   },

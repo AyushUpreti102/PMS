@@ -14,10 +14,19 @@
                         <v-card-subtitle class="v-card items">
                             <v-list style="background-color: transparent;">
                                 <v-list-item>
-                                    <v-list-item-title class="userInfo userNAme">{{ 'Username : ' + token.username }}</v-list-item-title>
+                                    <v-list-item-title class="userInfo userNAme">
+                                        <div>
+                                            <span>Username :</span>
+                                            <span style="font-weight: lighter;">{{' '+token.username}}</span>
+                                        </div>
+                                    </v-list-item-title>
                                 </v-list-item>
                                 <v-list-item>
-                                    <v-list-item-title class="userInfo role">{{ 'Role : ' + token.role }}
+                                    <v-list-item-title class="userInfo role">
+                                        <div>
+                                            <span>Role :</span>
+                                            <span style="font-weight: lighter;">{{' '+token.role}}</span>
+                                        </div>
                                     </v-list-item-title>
                                 </v-list-item>
                             </v-list>
@@ -39,7 +48,7 @@ export default {
     },
     mounted() {
         this.$store.dispatch('access', localStorage.getItem('token'));
-        this.$store.dispatch('showBtnsInNavBar', 'dashBoard');
+        this.$store.dispatch('showBtnsInNavBar');
     },
 }
 </script>
